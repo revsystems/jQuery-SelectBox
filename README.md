@@ -1,9 +1,9 @@
 # jQuery-SelectBox
 
-Traditional <select> elements are very difficult to style by themselves, 
-but they are also very usable and feature rich. This plugin attempts to 
-recreate all selectbox functionality and appearance while adding 
-animation and stylability.
+  Traditional <select> elements are very difficult to style by themselves, 
+  but they are also very usable and feature rich. This plugin attempts to 
+  recreate all selectbox functionality and appearance while adding 
+  animation and stylability.
 
 ## Features
 
@@ -20,6 +20,11 @@ animation and stylability.
   * Handles disabled options
   * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original <select>
 
+  The css in this plugin also includes an example custom style called "round_sb".
+  Its purposes are (a) to give you an example of how to override the default style, 
+  and (b) to give you a familiar but slightly more modern version of the selectbox 
+  that you can integrate with minimal or no css modification.
+
 ## Demo
 
   You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
@@ -28,13 +33,14 @@ animation and stylability.
 
   jQuery-SelectBox has been tested in the following browsers:
   
-  * Firefox 3.6
-  * Google Chrome
+  * Firefox 3.6.12
+  * Google Chrome 7.0.517.44
   * IE7 (via IE9 beta)
   * IE8 (via IE9 beta)
   * IE9 beta
   
-  jQuery-SelectBox requires jquery version 1.4 and up.
+  It requires [jQuery version 1.4.x](http://jquery.com) and up. It may also be compatible with 1.3.x in the 
+  near future.
 
 ## Usage
 
