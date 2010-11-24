@@ -24,6 +24,18 @@ animation and stylability.
 
   You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
 
+## Compatibility
+
+  jQuery-SelectBox has been tested in the following browsers:
+  
+  * Firefox 3.6
+  * Google Chrome
+  * IE7 (via IE9 beta)
+  * IE8 (via IE9 beta)
+  * IE9 beta
+  
+  jQuery-SelectBox requires jquery version 1.4 and up.
+
 ## Usage
 
 Requires [jQuery](http://jquery.com) and this plugin.
@@ -70,11 +82,11 @@ To apply with options set:
 
   **ddCtx** (selector / DOM Element / function that returns a selector)
   
-      Short for "Dropdown Context". When the dropdown is displayed, its markup is append to the bottom 
+      Short for "Dropdown Context". When the dropdown is displayed, its markup is appended to the bottom 
       of this context. This helps take care of any z-index issues that IE might have. If you are using 
       popups or overlays on your page, the default of "body" might not be appropriate and you can set 
-      something more specific. The ddCtx element should explicitly set the position css attribute to 
-      relative or absolute. Otherwise, the dropdown will not appear in the right place.
+      something more specific. When not using the default, the ddCtx element should have position:relative 
+      or position:absolute in its CSS. Otherwise, the dropdown will not appear in the right place.
 
   **fixedWidth**  (boolean)
 
@@ -99,10 +111,10 @@ To apply with options set:
       Rarely necessary. There is a point at which the window is so small that it doesn't make sense to use 
       scrollbars in the dropdown. In this scenario, the height of the document is extended with the dropdown.
 
-  **selectboxClass** (string)
-
-      The class used to identify selectboxes. This is used to kill inactive dropdowns when one is selected.
-
   **placement** ("before" / "after")
 
       Markup preference. Determines whether you want to place the markup before or after the existing select.
+
+  **selectboxClass** (string)
+
+      The class used to identify selectboxes. This is used to kill inactive dropdowns when one is selected.

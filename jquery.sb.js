@@ -25,8 +25,8 @@ jQuery.fn.sb = function(o) {
     maxHeight: false,             // if an integer, show scrollbars if the dropdown is too tall
     maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
     noScrollThreshold: 100,       // the minimum height of the dropdown before it can show scrollbars--very rarely applied
-    selectboxClass: 'selectbox',  // class to apply our markup
     placement: 'before'           // before | after (does the new markup go before or after the original select?
+    selectboxClass: 'selectbox',  // class to apply our markup
   }, o);
   
   $(this).each(function() {
