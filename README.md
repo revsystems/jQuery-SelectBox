@@ -20,6 +20,10 @@ animation and stylability.
   * Handles disabled options
   * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original <select>
 
+## Demo
+
+  You can view the selectboxes in action here: http://dl.dropbox.com/u/124192/websites/selectbox/index.html.
+
 ## Usage
 
 Requires [jQuery](http://jquery.com) and this plugin.
