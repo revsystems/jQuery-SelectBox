@@ -45,7 +45,7 @@ jQuery.fn.sb = function(o) {
       else if(o.placement == 'after') {
         $orig.after($sb);
       }
-      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + $orig.find("option:selected").text() + "</span> <span class='arrow_btn'><span class='interior'><span class='arrow'>&nbsp;</span></span></span></a>");
+      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + $orig.find("option:selected").html() + "</span> <span class='arrow_btn'><span class='interior'><span class='arrow'>&nbsp;</span></span></span></a>");
       $sb.append($display);
       $dd = $("<ul class='items " + $orig.attr("class") + "'></ul>");
       $sb.append($dd);
@@ -57,12 +57,12 @@ jQuery.fn.sb = function(o) {
           $ogItem.append($ogList);
           $dd.append($ogItem);
           $og.children("option").each(function() {
-            $ogList.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span> <span class='text'>" + $(this).text() + "</span></a></li>");
+            $ogList.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span> <span class='text'>" + $(this).html() + "</span></a></li>");
           });
         });
       }
       $orig.children("option").each(function() {
-        $dd.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span> <span class='text'>" + $(this).text() + "</span></a></li>");
+        $dd.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span> <span class='text'>" + $(this).html() + "</span></a></li>");
       });
       $items = $dd.find("li").not(".optgroup");
       $dd.children(":first").addClass("first");
@@ -119,6 +119,7 @@ jQuery.fn.sb = function(o) {
       $("." + o.selectboxClass).trigger("close");
     }
     
+    // to prevent multiple selects open at once
     function killAllButMe() {
       $("." + o.selectboxClass).not($sb[0]).trigger("close");
     }
