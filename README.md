@@ -22,7 +22,7 @@ animation and stylability.
 
 ## Demo
 
-  You can view the selectboxes in action here: http://dl.dropbox.com/u/124192/websites/selectbox/index.html.
+  You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
 
 ## Usage
 
