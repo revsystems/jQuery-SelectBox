@@ -8,7 +8,7 @@
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
   <script type="text/javascript" src="jquery.sb.js"></script>
   <script type="text/javascript" src="main.js"></script>
-  <style>
+  <style type="text/css">
     .outer_container{text-align:center;}
     .inner_container{margin:0 auto;text-align:left;width:960px;}
   </style>
@@ -19,89 +19,27 @@
     <div class="inner_container" style="position:relative;">
       <form action=".">
         <div>
-          
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
           <h1 style="margin-top:0;">jquery.sb.js Selectbox Replacement</h1>
-          
-          <h2>Features</h2>
-          <ul>
-            <li>Fully stylable and flexible with standard, valid markup</li>
-            <li>Replaces existing selects using $("select").sb() or $("select").sb({ options... })</li>
-            <li>Existing select value is updated behind-the-scenes</li>
-            <li>onchange handlers on original select still work</li>
-            <li>Allows up/down hotkeys on focus</li>
-            <li>Allows automatic matching of typed strings on focus</li>
-            <li>Javascript animations on close/open</li>
-            <li>Intelligent collision detection and collision solutions</li>
-            <li>Deals effectively with cross-browser z-index issues</li>
-            <li>Handles optgroups</li>
-            <li>Handles disabled selects</li>
-            <li>Handles disabled options</li>
-            <li>Trigger "reload" event on the original select to update the replacement with any changes you've made</li>
-          </ul>
-          <h2>Options</h2>
-          <ul>
-            <li>
-              <h4>acTimeout</h4>
-              <p>
-                Short for "Autocomplete Timeout". When a selectbox is highlighted, you can type to select a matching option.
-                This timeout specifies how long the user has after each keystroke to concatenate another letter onto the search string.
-                If there is no keystroke before the timeout is completed, the search string is reset.
-              </p>
-            </li>
-            <li>
-              <h4>animDuration</h4>
-              <p>
-                Short for "Animation Duration". The time it takes for the closing/opening dropdown animation to play.
-              </p>
-            </li>
-            <li>
-              <h4>ddCtx</h4>
-              <p>
-                Short for "Dropdown Context". When the dropdown is displayed, its markup is append to the bottom of this context. This helps take care of any z-index issues that IE might have. If you are using popups or overlays on your page, the default of "body" might not be appropriate and you can set something more specific.
-                The ddCtx element should explicitly set the position css attribute to relative or absolute. Otherwise, the dropdown will not appear in the right place.
-              </p>
-            </li>
-            <li>
-              <h4>fixedWidth</h4>
-              <p>
-                If set to true, the width of the select will be variable. In other words, the width of the selected value will conform to whatever that value is. The width of the dropdown will conform to the widest dropdown element.
-                By default, this is false, which means the width of the selected value inherits the width of the dropdown element.
-              </p>
-            </li>
-            <li>
-              <h4>maxHeight</h4>
-              <p>
-                Allows you to set the maximum pixel height of the dropdown. By default, the maximum height varies based on the position of the dropdown relative to the window.
-              </p>
-            </li>
-            <li>
-              <h4>maxWidth</h4>
-              <p>
-                Allows you to set the maximum pixel width of the selectbox. By default, the width varies based on the widest dropdown element. If white-space:nowrap is set on dropdown elements, then they will be clipped past the maxWidth.
-              </p>
-            </li>
-            <li>
-              <h4>noScrollThreshold</h4>
-              <p>
-                Rarely necessary. There is a point at which the window is so small that it doesn't make sense to use scrollbars in the dropdown. In this scenario, the height of the document is extended with the dropdown.
-              </p>
-            </li>
-            <li>
-              <h4>selectboxClass</h4>
-              <p>
-                The class used to identify selectboxes. This is used to kill inactive dropdowns when one is selected.
-              </p>
-            </li>
-            <li>
-              <h4>placement</h4>
-              <p>
-                Markup preference. Determines whether you want to place the markup before or after the existing select.
-              </p>
-            </li>
-          </ul>
-          <h1>Examples</h1>
+
+          <h1>Demos</h1>
           <div>
-            <select name="example2" class="round_sb" disabled>
+            <select name="example2" class="round_sb" disabled="disabled">
               <option>CT</option>
               <option>DE</option>
               <option>MA</option>
@@ -115,7 +53,7 @@
                 <option>Rumor</option>
               </optgroup>
               <optgroup label="Group 2">
-                <option disabled>Lorem ipsum</option>
+                <option disabled="disabled">Lorem ipsum</option>
                 <option>Whatever Whatever...</option>
               </optgroup>
               <option>Long dropdown test</option>
@@ -171,7 +109,7 @@
             <option>Test 2</option>
             <option>Test 3</option>
             <option>Test 4</option>
-            <option disabled>Test 5</option>
+            <option disabled="disabled">Test 5</option>
           </select>
           <select name="example4" class="round_sb">
             <option>CT</option>

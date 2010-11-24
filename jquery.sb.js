@@ -25,8 +25,8 @@ jQuery.fn.sb = function(o) {
     maxHeight: false,             // if an integer, show scrollbars if the dropdown is too tall
     maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
     noScrollThreshold: 100,       // the minimum height of the dropdown before it can show scrollbars--very rarely applied
-    placement: 'before'           // before | after (does the new markup go before or after the original select?
-    selectboxClass: 'selectbox',  // class to apply our markup
+    placement: 'before' ,         // before | after (does the new markup go before or after the original select?
+    selectboxClass: 'selectbox'   // class to apply our markup
   }, o);
   
   $(this).each(function() {
@@ -131,7 +131,7 @@ jQuery.fn.sb = function(o) {
         $sb.append($dd);
       });
       $(document).unbind("keyup", keyupSB);
-      $(document).unbind("keydown", stopUpDown);
+      $(document).unbind("keydown", stopPageHotkeys);
     }
     
     function getDDCtx() {
@@ -159,7 +159,7 @@ jQuery.fn.sb = function(o) {
       else if(dir == "down") $dd.slideDown(o.animDuration);
       else $dd.fadeIn(o.animDuration);
       $(document).unbind("keyup", keyupSB).keyup(keyupSB);
-      $(document).unbind("keydown", stopUpDown).keydown(stopUpDown);
+      $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
       $(document).click(killAndUnbind);
     }
     
@@ -280,9 +280,9 @@ jQuery.fn.sb = function(o) {
       }
       return false;
     }
-    function stopUpDown(e) {
-      // IE moves the window on keydown instead of keypress or keyup
-      if(e.which == 38 || e.which == 40) {
+    function stopPageHotkeys(e) {
+      // Stop up/down/backspace/space from moving the page
+      if(e.which == 38 || e.which == 40 || e.which == 8 || e.which == 32) {
         e.preventDefault();
       }
     }
@@ -330,7 +330,7 @@ jQuery.fn.sb = function(o) {
       $sb.addClass("focused");
       if(!$sb.is(".open")) {
         $(document).unbind("keyup", keyupSB).keyup(keyupSB);
-        $(document).unbind("keydown", stopUpDown).keydown(stopUpDown);
+        $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
       }
     }
     
@@ -338,7 +338,7 @@ jQuery.fn.sb = function(o) {
     function blurSB() {
       $sb.removeClass("focused");
       $(document).unbind("keyup", keyupSB);
-      $(document).unbind("keydown", stopUpDown);
+      $(document).unbind("keydown", stopPageHotkeys);
     }
     
     function addHoverState() { $(this).addClass("hover"); }
