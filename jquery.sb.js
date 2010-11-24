@@ -157,7 +157,9 @@ jQuery.fn.sb = function(o) {
       $sb.addClass("open");
       var dir = positionSB();
       $ddCtx.append($dd);
-      var setScrollFunc = function() { $dd.scrollTop($items.filter(".selected").offset().top - $dd.offset().top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2); };
+      function setScrollFunc() {
+        $dd.scrollTop($items.filter(".selected").offset().top - $dd.offset().top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
+      }
       if(dir == "up") $dd.fadeIn(o.animDuration, setScrollFunc);
       else if(dir == "down") $dd.slideDown(o.animDuration, setScrollFunc);
       else $dd.fadeIn(o.animDuration, setScrollFunc);
