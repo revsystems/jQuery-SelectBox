@@ -1,7 +1,6 @@
 # jQuery-SelectBox
 
   Traditional select elements are very difficult to style by themselves, 
-  Traditional select elements are very difficult to style by themselves, 
   but they are also very usable and feature rich. This plugin attempts to 
   recreate all selectbox functionality and appearance while adding 
   animation and stylability.
