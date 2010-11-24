@@ -45,48 +45,48 @@ Or to set specific options:
 
 ## Options
  
-  * acTimeout
+  **acTimeout**
   
-      Short for "Autocomplete Timeout". When a selectbox is highlighted, you can type to select a matching option.
-      This timeout specifies how long the user has after each keystroke to concatenate another letter onto the search string.
-      If there is no keystroke before the timeout is completed, the search string is reset.
+    Short for "Autocomplete Timeout". When a selectbox is highlighted, you can type to select a matching option.
+    This timeout specifies how long the user has after each keystroke to concatenate another letter onto the search string.
+    If there is no keystroke before the timeout is completed, the search string is reset.
 
-  * animDuration
+  **animDuration**
   
       Short for "Animation Duration". The time it takes for the closing/opening dropdown animation to play.
 
-  * ddCtx
+  **ddCtx**
   
       Short for "Dropdown Context". When the dropdown is displayed, its markup is append to the bottom of this context. This helps take 
       care of any z-index issues that IE might have. If you are using popups or overlays on your page, the default of "body" might not be appropriate 
       and you can set something more specific. The ddCtx element should explicitly set the position css attribute to relative or absolute. 
       Otherwise, the dropdown will not appear in the right place.
 
-  * fixedWidth
+  **fixedWidth**
 
       If set to true, the width of the select will be variable. In other words, the width of the selected value will conform to whatever that
       value is. The width of the dropdown will conform to the widest dropdown element. By default, this is false, which means the width of the 
       selected value inherits the width of the dropdown element.
 
-  * maxHeight
+  **maxHeight**
   
       Allows you to set the maximum pixel height of the dropdown. By default, the maximum height varies based on the position of the dropdown 
       relative to the window.
 
-  * maxWidth
+  **maxWidth**
 
       Allows you to set the maximum pixel width of the selectbox. By default, the width varies based on the widest dropdown element. If 
       white-space:nowrap is set on dropdown elements, then they will be clipped past the maxWidth.
 
-  * noScrollThreshold
+  **noScrollThreshold**
 
       Rarely necessary. There is a point at which the window is so small that it doesn't make sense to use scrollbars in the dropdown. 
       In this scenario, the height of the document is extended with the dropdown.
 
-  * selectboxClass
+  **selectboxClass**
 
       The class used to identify selectboxes. This is used to kill inactive dropdowns when one is selected.
 
-  * placement
+  **placement**
 
       Markup preference. Determines whether you want to place the markup before or after the existing select.
