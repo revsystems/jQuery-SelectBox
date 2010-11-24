@@ -13,7 +13,6 @@
   text-decoration:none;
 }
 .selectbox.disabled .display{color:#999;}
-.selectbox .display .text{line-height:13px;}
 .selectbox.focused .display .text{background-color:#3399ff;color:#fcfcfc;}
 .selectbox .display:active{border-color:#7b7d83;}
 .selectbox .display:active .arrow_btn{background-color:#9eb0ba;}
