@@ -3,7 +3,7 @@
 jQuery.fn.borderWidth = function() { return $(this).outerWidth() - $(this).innerWidth(); }
 jQuery.fn.marginWidth = function() { return $(this).outerWidth(true) - $(this).outerWidth(); }
 jQuery.fn.paddingWidth = function() { return $(this).innerWidth() - $(this).width(); }
-jQuery.fn.extraWidth = function() { return $(this).borderWidth() + $(this).marginWidth() + $(this).paddingWidth(); }
+jQuery.fn.extraWidth = function() { return $(this).outerWidth(true) - $(this).width(); }
 
 jQuery.fn.maxWidth = function() {
   var max = 0;
@@ -88,9 +88,6 @@ jQuery.fn.sb = function(o) {
       if(o.ddCtx == "self") {
         $ddCtx = $sb;
       }
-      else if(o.ddCtx == "window") {
-        $ddCtx = $(window);
-      }
       else if($.isFunction(o.ddCtx)) {
         $ddCtx = $(o.ddCtx.call($orig[0]));
       }
@@ -103,13 +100,13 @@ jQuery.fn.sb = function(o) {
       if(!$orig.is(":disabled")) {
         $display.click(clickSB).focus(focusSB).blur(blurSB).hover(addHoverState, removeHoverState);
         $items.not(".disabled").find("a").click(clickSBItem);
-        $items.filter(".disabled").find("a").click(function(e) { return false; });
+        $items.filter(".disabled").find("a").click(function() { return false; });
         $items.not(".disabled").hover(addHoverState, removeHoverState);
         $dd.find(".optgroup").hover(addHoverState, removeHoverState);
       }
       else {
         $sb.addClass("disabled");
-        $display.click(function() { return false; });
+        $display.click(function(e) { e.preventDefault(); });
       }
       $sb.bind("close", closeSB);
       $sb.bind("destroy", destroySB);
