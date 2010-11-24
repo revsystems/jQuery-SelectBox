@@ -1,6 +1,7 @@
 # jQuery-SelectBox
 
-  Traditional <select> elements are very difficult to style by themselves, 
+  Traditional select elements are very difficult to style by themselves, 
+  Traditional select elements are very difficult to style by themselves, 
   but they are also very usable and feature rich. This plugin attempts to 
   recreate all selectbox functionality and appearance while adding 
   animation and stylability.
@@ -12,8 +13,8 @@
 ## Features
 
   * Fully stylable and flexible with standard, valid markup
-  * Original <select> is updated behind-the-scenes
-  * Change event handlers on original <select> still work
+  * Original select is updated behind-the-scenes
+  * Change event handlers on original select still work
   * Allows up/down hotkeys on focus
   * Allows automatic matching of typed strings on focus
   * Javascript animations on close/open
@@ -22,7 +23,7 @@
   * Handles optgroups
   * Handles disabled selects
   * Handles disabled options
-  * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original <select>
+  * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original select
 
   The css in this plugin also includes an example custom style called "round_sb".
   Its purposes are (a) to give you an example of how to override the default style, 
@@ -70,7 +71,7 @@ To apply with options set:
       });
     });
 
-If you've used javascript to modify the contents of the original <select>, and you want the changes to appear in the replacement, triggering "reload" should match them:
+If you've used javascript to modify the contents of the original select, and you want the changes to appear in the replacement, triggering "reload" should match them:
 
     $(document).ready(function() {
       $("select").sb();
