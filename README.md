@@ -5,6 +5,8 @@
   but they are also very usable and feature rich. This plugin attempts to 
   recreate all selectbox functionality and appearance while adding 
   animation and stylability.
+  
+  Please feel free to rate this plugin on [plugins.jquery.com](http://plugins.jquery.com/project/jquery-sb).
 
 ## Demo
 
