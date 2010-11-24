@@ -41,8 +41,7 @@
   * IE8 (via IE9 beta)
   * IE9 beta
   
-  It requires [jQuery version 1.4.x](http://jquery.com) and up. It may also be compatible with 1.3.x in the 
-  near future.
+  It requires [jQuery version 1.3.x](http://jquery.com) and up.
 
 ## Usage
 
