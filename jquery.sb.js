@@ -157,9 +157,10 @@ jQuery.fn.sb = function(o) {
       $sb.addClass("open");
       var dir = positionSB();
       $ddCtx.append($dd);
-      if(dir == "up") $dd.fadeIn(o.animDuration);
-      else if(dir == "down") $dd.slideDown(o.animDuration);
-      else $dd.fadeIn(o.animDuration);
+      var setScrollFunc = function() { $dd.scrollTop($items.filter(".selected").offset().top - $dd.offset().top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2); };
+      if(dir == "up") $dd.fadeIn(o.animDuration, setScrollFunc);
+      else if(dir == "down") $dd.slideDown(o.animDuration, setScrollFunc);
+      else $dd.fadeIn(o.animDuration, setScrollFunc);
       $(document).unbind("keyup", keyupSB).keyup(keyupSB);
       $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
       $(document).click(killAndUnbind);
@@ -209,6 +210,7 @@ jQuery.fn.sb = function(o) {
         ddY = bottomOffset;
         dir = "down";
       }
+      
       
       // modify dropdown css for display
       $dd.css({
