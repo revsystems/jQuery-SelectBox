@@ -5,6 +5,10 @@
   recreate all selectbox functionality and appearance while adding 
   animation and stylability.
 
+## Demo
+
+  You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
+
 ## Features
 
   * Fully stylable and flexible with standard, valid markup
@@ -24,10 +28,6 @@
   Its purposes are (a) to give you an example of how to override the default style, 
   and (b) to give you a familiar but slightly more modern version of the selectbox 
   that you can integrate with minimal or no css modification.
-
-## Demo
-
-  You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
 
 ## Compatibility
 
