@@ -35,7 +35,6 @@ jQuery.fn.sb = function(o) {
     var $display = null;
     var $dd = null;
     var $items = null;
-    var $ddCtx = null;
     
     function loadSB() {
       // create the new markup from the old
@@ -82,17 +81,6 @@ jQuery.fn.sb = function(o) {
       }
       else if(o.maxWidth && $sb.width() > o.maxWidth) {
         $sb.width(o.maxWidth);
-      }
-      
-      // get the context where the dropdown will be appended
-      if(o.ddCtx == "self") {
-        $ddCtx = $sb;
-      }
-      else if($.isFunction(o.ddCtx)) {
-        $ddCtx = $(o.ddCtx.call($orig[0]));
-      }
-      else {
-        $ddCtx = $(o.ddCtx);
       }
       
       // initialize dd and bindings
@@ -146,8 +134,23 @@ jQuery.fn.sb = function(o) {
       $(document).unbind("keydown", stopUpDown);
     }
     
+    function getDDCtx() {
+      var $ddCtx = null;
+      if(o.ddCtx == "self") {
+        $ddCtx = $sb;
+      }
+      else if($.isFunction(o.ddCtx)) {
+        $ddCtx = $(o.ddCtx.call($orig[0]));
+      }
+      else {
+        $ddCtx = $(o.ddCtx);
+      }
+      return $ddCtx;
+    }
+    
     // show, reposition, and reset dropdown markup
     function openSB() {
+      var $ddCtx = getDDCtx();
       killAll();
       $sb.addClass("open");
       var dir = positionSB();
@@ -162,6 +165,7 @@ jQuery.fn.sb = function(o) {
     
     // position dropdown based on collision detection
     function positionSB() {
+      var $ddCtx = getDDCtx();
       var ddMaxHeight = 0;
       var ddY = 0;
       var dir = "";
