@@ -64,6 +64,14 @@ To apply with options set:
       });
     });
 
+If you've used javascript to modify the contents of the original <select>, and you want the changes to appear in the replacement, triggering "reload" should match them:
+
+    $(document).ready(function() {
+      $("select").sb();
+      $("select").append("<option>Hey! I'm new!</option>");
+      $("select").trigger("reload");
+    });
+
 ## Options
   
   View defaults and short descriptions for options in jquery.sb.js. This list is meant to be more 
