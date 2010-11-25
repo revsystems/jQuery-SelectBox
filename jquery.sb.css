@@ -37,6 +37,7 @@
   -moz-box-shadow:0 3px 5px rgba(0,0,0,.5);
   -webkit-box-shadow:0 3px 5px rgba(0,0,0,.5);
 }
+.items.above{}
 .items li{display:block;margin:0;padding:0;/*white-space:nowrap; maybe necessary if using fixedWidth: false */}
 .items li:first-child{margin-top:0;}
 .items li>a{color:#000;cursor:default;display:block;padding:1px 3px;text-decoration:none;}
