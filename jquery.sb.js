@@ -112,14 +112,18 @@ jQuery.fn.sb = function(o) {
       $sb.bind("close", closeSB);
       $sb.bind("destroy", destroySB);
       $orig.bind("reload", function() { destroySB(); loadSB(); });
-      $orig.focus(function() { $display.focus(); return false; });
+      $orig.focus(focusOrig);
     }
+    
+    function focusOrig() { $display.focus(); return false; }
+    
+    function reloadSB() { destroySB(); loadSB(); }
     
     // unbind and remove
     function destroySB() {
       $sb.unbind().find("*").unbind();
       $sb.remove();
-      $orig.unbind().show();
+      $orig.unbind("reload", reloadSB).unbind("focus", focusOrig).show();
     }
     
     // when the user clicks outside the sb
