@@ -25,6 +25,7 @@
   * Handles disabled selects
   * Handles disabled options
   * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original select
+  * Allows custom markup formatting for visible elements
 
   The css in this plugin also includes an example custom style called "round_sb".
   Its purposes are (a) to give you an example of how to override the default style, 
@@ -94,7 +95,21 @@ If you've used javascript to modify the contents of the original select, and you
   **animDuration** (duration)
   
       Short for "Animation Duration". The time it takes for the closing/opening dropdown animation to play.
-
+  
+  **arrowMarkup** (string)
+  
+      The HTML that is appended to the display. Usually it's an arrow, but it could be whatever you want.
+      
+  **optionFormat** (function)
+      
+      Given an option as the context, returns a string that will be displayed in the dropdown. The default
+      is simply to use the option's text.
+      
+  **optgroupFormat** (function)
+      
+      Given an optgroup as the context, returns a string that will be displayed in the dropdown. The 
+      default displays the optgroup's label attribute.
+      
   **ddCtx** (selector / DOM Element / function that returns a selector)
   
       Short for "Dropdown Context". When the dropdown is displayed, its markup is appended to the bottom 

@@ -26,7 +26,20 @@ jQuery.fn.sb = function(o) {
     maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
     noScrollThreshold: 100,       // the minimum height of the dropdown before it can show scrollbars--very rarely applied
     placement: 'before' ,         // before | after (does the new markup go before or after the original select?
-    selectboxClass: 'selectbox'   // class to apply our markup
+    selectboxClass: 'selectbox',  // class to apply our markup
+    
+    // markup appended to the display, typically for styling an arrow
+    arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'>&nbsp;</span></span></span>",
+    
+    // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
+    optionFormat: function(ogIndex, optIndex) {
+      return $(this).text();
+    },
+    
+    // the function to produce optgroup markup
+    optgroupFormat: function(ogIndex) {
+      return "<span class='label'>" + $(this).attr("label") + "</span>";
+    }
   }, o);
   
   $(this).each(function() {
@@ -45,24 +58,24 @@ jQuery.fn.sb = function(o) {
       else if(o.placement == 'after') {
         $orig.after($sb);
       }
-      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + $orig.find("option:selected").html() + "</span> <span class='arrow_btn'><span class='interior'><span class='arrow'>&nbsp;</span></span></span></a>");
+      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + o.optionFormat.call($orig.find("option:selected")[0], 0, 0) + "</span>" + o.arrowMarkup + "</a>");
       $sb.append($display);
       $dd = $("<ul class='items " + $orig.attr("class") + "'></ul>");
       $sb.append($dd);
       if($orig.children("optgroup").size() > 0) {
-        $orig.children("optgroup").each(function() {
+        $orig.children("optgroup").each(function(i) {
           var $og = $(this);
-          var $ogItem = $("<li class='optgroup'><span class='label'>" + $og.attr("label") + "</span></li>");
+          var $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
           var $ogList = $("<ul class='items'></ul>");
           $ogItem.append($ogList);
           $dd.append($ogItem);
-          $og.children("option").each(function() {
-            $ogList.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span> <span class='text'>" + $(this).html() + "</span></a></li>");
+          $og.children("option").each(function(j) {
+            $ogList.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, i+1, j+1) + "</span></a></li>");
           });
         });
       }
-      $orig.children("option").each(function() {
-        $dd.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span> <span class='text'>" + $(this).html() + "</span></a></li>");
+      $orig.children("option").each(function(i) {
+        $dd.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
       });
       $items = $dd.find("li").not(".optgroup");
       $dd.children(":first").addClass("first");
@@ -176,6 +189,7 @@ jQuery.fn.sb = function(o) {
       var dir = "";
       
       // modify dropdown css for getting values
+      $dd.removeClass("above");
       $dd.css({
         display: "block",
         maxHeight: "none",
@@ -223,6 +237,7 @@ jQuery.fn.sb = function(o) {
         top: ddY,
         visibility: "visible"
       });
+      if(dir == "up") $dd.addClass("above");
       return dir;
     }
     
