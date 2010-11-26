@@ -148,3 +148,14 @@ If you've used javascript to modify the contents of the original select, and you
   **selectboxClass** (string)
 
       The class used to identify selectboxes. This is used to kill inactive dropdowns when one is selected.
+      
+## Troubleshooting
+
+  **jQuery-SelectBox in div with z-index**
+  
+      If you call $("select").sb() (no special options) on a select in a z-index'ed element, the dropdown 
+      may appear UNDERNEATH the element.
+      
+      You have two options in dealing with this scenario. The first is setting ddCtx to the absolutely 
+      positioned element. This will make sure that it always appears on top of it. Or you can modify the 
+      css for .items to have a z-index greater than the parent div.
