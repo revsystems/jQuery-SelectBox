@@ -43,7 +43,7 @@ jQuery.fn.sb = function(o) {
     selectboxClass: 'selectbox',  // class to apply our markup
     
     // markup appended to the display, typically for styling an arrow
-    arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'>&nbsp;</span></span></span>",
+    arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'></span></span></span>",
     
     // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
     optionFormat: function(ogIndex, optIndex) {
@@ -240,7 +240,7 @@ jQuery.fn.sb = function(o) {
         ddY = ($display.offset().top - $ddCtx.offset().top) - Math.min(ddMaxHeight, $dd.outerHeight());
       }
       else {
-        ddMaxHeight = "none";
+        ddMaxHeight = o.maxHeight ? o.maxHeight : "none";
         ddY = bottomOffset;
         dir = "down";
       }
@@ -286,7 +286,6 @@ jQuery.fn.sb = function(o) {
     
     // when the user explicitly clicks an item
     function clickSBItem(e) {
-      var $item = $(this);
       selectItem.call(this);
       killAndUnbind();
       $display.focus();
