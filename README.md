@@ -159,3 +159,12 @@ If you've used javascript to modify the contents of the original select, and you
       You have two options in dealing with this scenario. The first is setting ddCtx to the absolutely 
       positioned element. This will make sure that it always appears on top of it. Or you can modify the 
       css for .items to have a z-index greater than the parent div.
+  
+  **Dropdown appears relative to display, but it's slightly off**
+  
+      First, if you're using all defaults, check if there is margin on the body element on your page. A margin 
+      there throws off the calculations of jQuery-SelectBox. If this is the case, you may want to change the 
+      ddCtx option to something you know will work.
+      
+      If you've set the ddCtx and it's still not positioning correctly, make sure the ddCtx element has 
+      position:relative assigned to its css.
