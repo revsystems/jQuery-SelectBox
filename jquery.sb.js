@@ -14,10 +14,10 @@
 
 (function($) {
 
-jQuery.fn.borderWidth = function() { return $(this).outerWidth() - $(this).innerWidth(); }
-jQuery.fn.marginWidth = function() { return $(this).outerWidth(true) - $(this).outerWidth(); }
-jQuery.fn.paddingWidth = function() { return $(this).innerWidth() - $(this).width(); }
-jQuery.fn.extraWidth = function() { return $(this).outerWidth(true) - $(this).width(); }
+jQuery.fn.borderWidth = function() { return $(this).outerWidth() - $(this).innerWidth(); };
+jQuery.fn.marginWidth = function() { return $(this).outerWidth(true) - $(this).outerWidth(); };
+jQuery.fn.paddingWidth = function() { return $(this).innerWidth() - $(this).width(); };
+jQuery.fn.extraWidth = function() { return $(this).outerWidth(true) - $(this).width(); };
 
 jQuery.fn.maxWidth = function() {
   var max = 0;
@@ -384,6 +384,6 @@ jQuery.fn.sb = function(o) {
     
     loadSB();
   });
-}
+};
 
 })(jQuery);
