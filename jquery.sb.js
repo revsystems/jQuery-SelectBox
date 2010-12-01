@@ -18,6 +18,12 @@ jQuery.fn.borderWidth = function() { return $(this).outerWidth() - $(this).inner
 jQuery.fn.marginWidth = function() { return $(this).outerWidth(true) - $(this).outerWidth(); };
 jQuery.fn.paddingWidth = function() { return $(this).innerWidth() - $(this).width(); };
 jQuery.fn.extraWidth = function() { return $(this).outerWidth(true) - $(this).width(); };
+jQuery.fn.offsetFrom = function($e) { 
+  return {
+    left: $(this).offset().left - $e.offset().left,
+    top: $(this).offset().top - $e.offset().top
+  };
+};
 
 jQuery.fn.maxWidth = function() {
   var max = 0;
@@ -189,7 +195,7 @@ jQuery.fn.sb = function(o) {
       var dir = positionSB();
       $ddCtx.append($dd);
       function setScrollFunc() {
-        $dd.scrollTop($items.filter(".selected").offset().top - $dd.offset().top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
+        $dd.scrollTop($items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
       }
       if(dir == "up") $dd.fadeIn(o.animDuration, setScrollFunc);
       else if(dir == "down") $dd.slideDown(o.animDuration, setScrollFunc);
@@ -219,7 +225,7 @@ jQuery.fn.sb = function(o) {
       // figure out if we should show above/below the display box
       var bottomSpace = $(window).scrollTop() + $(window).height() - $display.offset().top - $display.outerHeight();
       var topSpace = $display.offset().top - $(window).scrollTop();
-      var bottomOffset = ($display.offset().top - $ddCtx.offset().top) + $display.outerHeight();
+      var bottomOffset = $display.offsetFrom($ddCtx).top + $display.outerHeight();
       if($dd.outerHeight() <= bottomSpace) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
         ddY = bottomOffset;
@@ -227,7 +233,7 @@ jQuery.fn.sb = function(o) {
       }
       else if($dd.outerHeight() <= topSpace) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
-        ddY = ($display.offset().top - $ddCtx.offset().top) - Math.min(ddMaxHeight, $dd.outerHeight());
+        ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
         dir = "up"
       }
       else if(bottomSpace > o.noScrollThreshold && bottomSpace > topSpace) {
@@ -237,7 +243,7 @@ jQuery.fn.sb = function(o) {
       }
       else if(topSpace > o.noScrollThreshold) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
-        ddY = ($display.offset().top - $ddCtx.offset().top) - Math.min(ddMaxHeight, $dd.outerHeight());
+        ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
       }
       else {
         ddMaxHeight = o.maxHeight ? o.maxHeight : "none";
@@ -249,10 +255,10 @@ jQuery.fn.sb = function(o) {
       // modify dropdown css for display
       $dd.css({
         display: "none",
-        left: $display.offset().left - $ddCtx.offset().left,
+        left: $display.offsetFrom($ddCtx).left + ($ddCtx[0].tagName.toLowerCase() == "body" ? parseInt($("body").css("margin-left")) : 0),
         maxHeight: ddMaxHeight,
         position: "absolute",
-        top: ddY,
+        top: ddY + ($ddCtx[0].tagName.toLowerCase() == "body" ? parseInt($("body").css("margin-top")) : 0),
         visibility: "visible"
       });
       if(dir == "up") $dd.addClass("above");
