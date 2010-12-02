@@ -72,12 +72,7 @@ jQuery.fn.sb = function(o) {
     function loadSB() {
       // create the new markup from the old
       $sb = $("<div class='" + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
-      if(o.placement == 'before') {
-        $orig.before($sb);
-      }
-      else if(o.placement == 'after') {
-        $orig.after($sb);
-      }
+      $("body").append($sb);
       $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + o.optionFormat.call($orig.find("option:selected")[0], 0, 0) + "</span>" + o.arrowMarkup + "</a>");
       $sb.append($display);
       $dd = $("<ul class='items " + $orig.attr("class") + "'></ul>");
@@ -116,6 +111,12 @@ jQuery.fn.sb = function(o) {
         $sb.width(o.maxWidth);
       }
       
+      if(o.placement == 'before') {
+        $orig.before($sb);
+      }
+      else if(o.placement == 'after') {
+        $orig.after($sb);
+      }
       // initialize dd and bindings
       $dd.hide();
       if(!$orig.is(":disabled")) {
