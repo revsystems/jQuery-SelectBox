@@ -1,13 +1,13 @@
 /* always visible styles */
 .selectbox{display:inline-block;*display:inline;font-family:arial;font-size:13px;margin:1px;position:relative;zoom:1;}
 .selectbox .display{
+  background:#fff;
   border:1px solid #abadb3;
   color:#000;
   cursor:default;
   display:block;
   height:19px;
   line-height:19px;
-  overflow:hidden;
   padding:0 24px 0 3px;
   position:relative;
   text-decoration:none;
