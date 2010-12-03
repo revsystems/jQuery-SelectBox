@@ -77,7 +77,7 @@ If you've used javascript to modify the contents of the original select, and you
     $(document).ready(function() {
       $("select").sb();
       $("select").append("<option>Hey! I'm new!</option>");
-      $("select").trigger("reload");
+      $("select").triggerHandler("reload");
     });
 
 ## Options
@@ -159,6 +159,9 @@ If you've used javascript to modify the contents of the original select, and you
       You have two options in dealing with this scenario. The first is setting ddCtx to the absolutely 
       positioned element. This will make sure that it always appears on top of it. Or you can modify the 
       css for .items to have a z-index greater than the parent div.
+      
+      For newer versions, I set the default z-index of .items to 99999, so you probably won't see this issue 
+      unless you're using huge z-index values.
   
   **Dropdown appears relative to display, but it's slightly off**
   
