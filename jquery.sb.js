@@ -99,7 +99,7 @@ jQuery.fn.sb = function(o) {
     
       if(o.fixedWidth) {
         // match display size to largest element
-        var largestWidth = $sb.find(".text").maxWidth() + $display.extraWidth();
+        var largestWidth = $sb.find(".text").maxWidth() + $display.extraWidth() + 1;
         $sb.width(o.maxWidth ? Math.min(o.maxWidth, largestWidth) : largestWidth);
         if($.browser.msie && $.browser.version <= 7) {
           $items.find("a").each(function() {
@@ -221,7 +221,7 @@ jQuery.fn.sb = function(o) {
         position: "relative",
         visibility: "hidden" 
       });
-      if(o.fixedWidth) $dd.width($display.outerWidth() - $dd.extraWidth());
+      if(o.fixedWidth) $dd.width($display.outerWidth() - $dd.extraWidth() + 1);
       
       // figure out if we should show above/below the display box
       var bottomSpace = $(window).scrollTop() + $(window).height() - $display.offset().top - $display.outerHeight();
