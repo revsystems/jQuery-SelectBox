@@ -165,13 +165,13 @@ jQuery.fn.sb = function(o) {
     
     // hide and reset dropdown markup
     function closeSB() {
-      $sb.removeClass("open");
       $items.removeClass("hover");
-      $dd.fadeOut(o.animDuration, function() {
-        $sb.append($dd);
-      });
       $(document).unbind("keyup", keyupSB);
       $(document).unbind("keydown", stopPageHotkeys);
+      $dd.fadeOut(o.animDuration, function() {
+        $sb.removeClass("open");
+        $sb.append($dd);
+      });
     }
     
     function getDDCtx() {
