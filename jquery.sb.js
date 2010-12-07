@@ -198,6 +198,10 @@ jQuery.fn.sb = function(o) {
       function setScrollFunc() {
         $dd.scrollTop($items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
       }
+      if($.browser.msie && $.browser.version < 8) {
+        // fix ie7 display bug
+        $("." + o.selectboxClass + " .display").hide().show();
+      }
       if(dir == "up") $dd.fadeIn(o.animDuration, setScrollFunc);
       else if(dir == "down") $dd.slideDown(o.animDuration, setScrollFunc);
       else $dd.fadeIn(o.animDuration, setScrollFunc);
@@ -235,7 +239,7 @@ jQuery.fn.sb = function(o) {
       else if($dd.outerHeight() <= topSpace) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
         ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
-        dir = "up"
+        dir = "up";
       }
       else if(bottomSpace > o.noScrollThreshold && bottomSpace > topSpace) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
