@@ -77,8 +77,8 @@ jQuery.fn.sb = function(o) {
       $sb.append($display);
       $dd = $("<ul class='items " + $orig.attr("class") + "'></ul>");
       $sb.append($dd);
-      if($orig.children("optgroup").size() > 0) {
-        $orig.children("optgroup").each(function(i) {
+      $orig.children().each(function(i) {
+        if($(this).is("optgroup")) {
           var $og = $(this);
           var $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
           var $ogList = $("<ul class='items'></ul>");
@@ -87,10 +87,10 @@ jQuery.fn.sb = function(o) {
           $og.children("option").each(function(j) {
             $ogList.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, i+1, j+1) + "</span></a></li>");
           });
-        });
-      }
-      $orig.children("option").each(function(i) {
-        $dd.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
+        }
+        else {
+          $dd.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
+        }
       });
       $items = $dd.find("li").not(".optgroup");
       $dd.children(":first").addClass("first");
@@ -99,7 +99,7 @@ jQuery.fn.sb = function(o) {
     
       if(o.fixedWidth) {
         // match display size to largest element
-        var largestWidth = $sb.find(".text").maxWidth() + $display.extraWidth() + 1;
+        var largestWidth = $sb.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
         $sb.width(o.maxWidth ? Math.min(o.maxWidth, largestWidth) : largestWidth);
         if($.browser.msie && $.browser.version <= 7) {
           $items.find("a").each(function() {
