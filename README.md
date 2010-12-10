@@ -117,6 +117,13 @@ If you've used javascript to modify the contents of the original select, and you
       popups or overlays on your page, the default of "body" might not be appropriate and you can set 
       something more specific. When not using the default, the ddCtx element should have position:relative 
       or position:absolute in its CSS. Otherwise, the dropdown will not appear in the right place.
+      
+  **dropupThreshold** (integer)
+      
+      When determining whether to display a dropdown or a dropup, this value is used to weight the comparison.
+      The space above is compared to the space below the selectbox. If the dropupThreshold is positive, then 
+      the space above must be that many more pixels than the space below to show above. If the dropupThreshold 
+      is negative, then the space below must be that many more pixels than the space above to show below.
 
   **fixedWidth**  (boolean)
 
@@ -135,11 +142,6 @@ If you've used javascript to modify the contents of the original select, and you
       Allows you to set the maximum pixel width of the selectbox. By default, the width varies based on the 
       widest dropdown element. If white-space:nowrap is set on dropdown elements, then they will be clipped 
       past the maxWidth.
-
-  **noScrollThreshold** (positive integer)
-
-      Rarely necessary. There is a point at which the window is so small that it doesn't make sense to use 
-      scrollbars in the dropdown. In this scenario, the height of the document is extended with the dropdown.
 
   **placement** ("before" / "after")
 

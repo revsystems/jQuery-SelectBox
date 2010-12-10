@@ -41,6 +41,7 @@ jQuery.fn.sb = function(o) {
     acTimeout: 800,               // time between each keyup for the user to create a search string
     animDuration: 300,            // time to open/close dropdown in ms
     ddCtx: 'body',                // body | self | any selector | a function that returns a selector (the original select is the context)
+    dropupThreshold: 150,         // the minimum amount of extra space required above the selectbox for it to display a dropup
     fixedWidth: true,             // if false, dropdown expands to widest and display conforms to whatever is selected
     maxHeight: false,             // if an integer, show scrollbars if the dropdown is too tall
     maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
@@ -231,22 +232,23 @@ jQuery.fn.sb = function(o) {
       var bottomSpace = $(window).scrollTop() + $(window).height() - $display.offset().top - $display.outerHeight();
       var topSpace = $display.offset().top - $(window).scrollTop();
       var bottomOffset = $display.offsetFrom($ddCtx).top + $display.outerHeight();
-      if($dd.outerHeight() <= bottomSpace) {
+      var spaceDiff = bottomSpace - topSpace + o.dropupThreshold;
+      if($dd.outerHeight() < bottomSpace) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
         ddY = bottomOffset;
         dir = "down";
       }
-      else if($dd.outerHeight() <= topSpace) {
+      else if($dd.outerHeight() < topSpace) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
         ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
         dir = "up";
       }
-      else if(bottomSpace > o.noScrollThreshold && bottomSpace > topSpace) {
+      else if(spaceDiff >= 0) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
         ddY = bottomOffset;
         dir = "down";
       }
-      else if(topSpace > o.noScrollThreshold) {
+      else if(spaceDiff < 0) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
         ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
         dir = "up";
