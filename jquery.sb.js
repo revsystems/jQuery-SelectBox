@@ -249,6 +249,7 @@ jQuery.fn.sb = function(o) {
       else if(topSpace > o.noScrollThreshold) {
         ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
         ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
+        dir = "up";
       }
       else {
         ddMaxHeight = o.maxHeight ? o.maxHeight : "none";
