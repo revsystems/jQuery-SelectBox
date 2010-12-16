@@ -5,7 +5,7 @@
   <meta http-equiv="content-type"  content="text/html;charset=UTF-8" />
   <title>Selectbox Replacment Demo</title>
   <link rel="stylesheet" href="jquery.sb.css" type="text/css" media="all" />
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
   <script type="text/javascript" src="jquery.sb.js"></script>
   <script type="text/javascript" src="main.js"></script>
   <style type="text/css">
@@ -133,7 +133,17 @@
             <option value="Gift certificate 9 $400.00">Gift certificate 9 $400.00</option>
           </select>
 
+          <select name="sort" onchange="location = this.value">
+            <option value="http://glideint.com/clients/beertoyou/homeBrew?sort=p.sort_order&order=ASC">Default</option>
+            <option value="http://glideint.com/clients/beertoyou/homeBrew?sort=pd.name&order=ASC">Name A - Z</option>
+            <option value="http://glideint.com/clients/beertoyou/homeBrew?sort=pd.name&order=DESC">Name Z - A</option>
+            <!--option value="< ?php echo $sorts['href']; ?>" selected="selected">< ?php echo $sorts['text']; ?></option-->
+            <option value="http://glideint.com/clients/beertoyou/homeBrew?sort=p.price&order=ASC" selected="selected">Price Low &gt; High</option>
+            <option value="http://glideint.com/clients/beertoyou/homeBrew?sort=p.price&order=DESC">Price High &gt; Low</option>
 
+            <option value="http://glideint.com/clients/beertoyou/homeBrew?sort=rating&order=DESC">Rating Highest</option>
+            <option value="http://glideint.com/clients/beertoyou/homeBrew?sort=rating&order=ASC">Rating Lowest</option>
+          </select>
           <br/>
           <br/>
           <br/>

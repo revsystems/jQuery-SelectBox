@@ -35,6 +35,7 @@ jQuery.fn.maxWidth = function() {
 
 jQuery.fn.sb = function(o) {
 
+  var $sbs = $(this);
   if($.browser.msie && $.browser.version < 7) return $(this);
   
   o = $.extend({
@@ -63,7 +64,7 @@ jQuery.fn.sb = function(o) {
     }
   }, o);
   
-  $(this).each(function() {
+  $sbs.each(function() {
     var $orig = $(this);
     var $sb = null;
     var $display = null;
@@ -86,11 +87,15 @@ jQuery.fn.sb = function(o) {
           $ogItem.append($ogList);
           $dd.append($ogItem);
           $og.children("option").each(function(j) {
-            $ogList.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, i+1, j+1) + "</span></a></li>");
+            var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, i+1, j+1) + "</span></a></li>");
+            $li.data("val", $(this).attr("value"));
+            $ogList.append($li);
           });
         }
         else {
-          $dd.append("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
+          var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>")
+          $li.data("val", $(this).attr("value"));
+          $dd.append($li);
         }
       });
       $items = $dd.find("li").not(".optgroup");
@@ -133,7 +138,7 @@ jQuery.fn.sb = function(o) {
       }
       $sb.bind("close", closeSB);
       $sb.bind("destroy", destroySB);
-      $orig.bind("reload", function() { destroySB(); loadSB(); });
+      $orig.bind("reload", reloadSB);
       $orig.focus(focusOrig);
     }
     
@@ -295,7 +300,7 @@ jQuery.fn.sb = function(o) {
       $display.find(".text").attr("title", $item.find(".text").html());
       $dd.find("li").removeClass("selected");
       $item.closest("li").addClass("selected");
-      $orig.val($display.find(".value").html()).change();
+      $orig.val($item.closest("li").data("val")).change();
     }
     
     // when the user explicitly clicks an item
