@@ -173,3 +173,12 @@ If you've used javascript to modify the contents of the original select, and you
       
       If you've set the ddCtx and it's still not positioning correctly, make sure the ddCtx element has 
       position:relative assigned to its css.
+  
+  **IE7/IE8: Javascript error is thrown when clicking to open the selectbox**
+      
+      First thing to check is if you are using "auto" or some other non-integer value for the margin on your 
+      "body" element. jquery-sb tries to be compatible with integer margins on body, but may have huge problems 
+      with "auto" in these browsers.
+      
+      If you need to center your page, you can do with without setting a margin on "body". Please check out 
+      the jquery-sb demo page along with my use of outer_container and inner_container classes.
