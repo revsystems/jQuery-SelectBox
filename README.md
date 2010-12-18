@@ -52,7 +52,7 @@ Requires [jQuery](http://jquery.com) and this plugin.
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
     <script type="text/javascript" src="jquery.sb.js"></script>
     
-If you want to use dynamic selects with jquery.tie, you need to include it before jquery.sb:
+If you want to use dynamic selects with [jquery.tie](https://github.com/revsystems/jQuery-Tie), you need to include it before jquery.sb:
 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
     <script type="text/javascript" src="jquery.tie.js"></script>
@@ -168,7 +168,7 @@ Alternatively, if you don't have control over the function that triggers the rel
       
   **useTie** (boolean)
       
-      Default is false. When set to true and [jquery.tie](https://github.com/revsystems/jQuery-Tie) is 
+      Default is false. When set to true and jquery.tie is 
       included on the page, this will automatically monitor changes in the underlying select and update 
       jquery-sb accordingly.
       
