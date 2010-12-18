@@ -139,7 +139,7 @@ jQuery.fn.sb = function(o) {
       $sb.bind("destroy", destroySB);
       $orig.bind("reload", reloadSB);
       if(jQuery.fn.tie && o.useTie) {
-        $orig.bind("domchange", delayReloadSB);
+        $orig.bind("domupdate", delayReloadSB);
       }
       $orig.focus(focusOrig);
     }
@@ -167,7 +167,7 @@ jQuery.fn.sb = function(o) {
     function destroySB() {
       $sb.unbind().find("*").unbind();
       $sb.remove();
-      $orig.unbind("reload", reloadSB).unbind("domchange", delayReloadSB).unbind("focus", focusOrig).show();
+      $orig.unbind("reload", reloadSB).unbind("domupdate", delayReloadSB).unbind("focus", focusOrig).show();
     }
     
     // when the user clicks outside the sb

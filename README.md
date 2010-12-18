@@ -25,7 +25,7 @@
   * Handles disabled selects
   * Handles disabled options
   * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original select
-  * Can be set to reload automatically (using jquery.tie) when the underlying select changes
+  * Can be set to reload automatically, using [jquery.tie](https://github.com/revsystems/jQuery-Tie), when the underlying select changes
   * Allows custom markup formatting for visible elements
 
   The css in this plugin also includes an example custom style called "round_sb".
@@ -88,7 +88,7 @@ If you've used javascript to modify the contents of the original select, and you
     });
     
 Alternatively, if you don't have control over the function that triggers the reload--for example, if you're using an AJAX framework--you can use 
-jquery.tie to monitor the contents of the original select and update when necessary:
+[jquery.tie](https://github.com/revsystems/jQuery-Tie) to monitor the contents of the original select and update when necessary:
 
     $(document).ready(function() {
       $("select").sb({ useTie: true });
@@ -165,6 +165,12 @@ jquery.tie to monitor the contents of the original select and update when necess
   **selectboxClass** (string)
 
       The class used to identify selectboxes. This is used to kill inactive dropdowns when one is selected.
+      
+  **useTie** (boolean)
+      
+      Default is false. When set to true and [jquery.tie](https://github.com/revsystems/jQuery-Tie) is 
+      included on the page, this will automatically monitor changes in the underlying select and update 
+      jquery-sb accordingly.
       
 ## Troubleshooting
 
