@@ -25,6 +25,7 @@
   * Handles disabled selects
   * Handles disabled options
   * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original select
+  * Can be set to reload automatically (using jquery.tie) when the underlying select changes
   * Allows custom markup formatting for visible elements
 
   The css in this plugin also includes an example custom style called "round_sb".
@@ -49,6 +50,12 @@
 Requires [jQuery](http://jquery.com) and this plugin.
 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.sb.js"></script>
+    
+If you want to use dynamic selects with jquery.tie, you need to include it before jquery.sb:
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.tie.js"></script>
     <script type="text/javascript" src="jquery.sb.js"></script>
 
 There is also css. You can feel free to copy this css to your master file or include it separately.
@@ -78,6 +85,14 @@ If you've used javascript to modify the contents of the original select, and you
       $("select").sb();
       $("select").append("<option>Hey! I'm new!</option>");
       $("select").triggerHandler("reload");
+    });
+    
+Alternatively, if you don't have control over the function that triggers the reload--for example, if you're using an AJAX framework--you can use 
+jquery.tie to monitor the contents of the original select and update when necessary:
+
+    $(document).ready(function() {
+      $("select").sb({ useTie: true });
+      $("select").append("<option>Hey! I'm new!</option>");
     });
 
 ## Options

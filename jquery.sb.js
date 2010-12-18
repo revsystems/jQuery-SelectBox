@@ -34,8 +34,6 @@ jQuery.fn.maxWidth = function() {
 }
 
 jQuery.fn.sb = function(o) {
-
-  var $sbs = $(this);
   if($.browser.msie && $.browser.version < 7) return $(this);
   
   o = $.extend({
@@ -49,6 +47,7 @@ jQuery.fn.sb = function(o) {
     noScrollThreshold: 100,       // the minimum height of the dropdown before it can show scrollbars--very rarely applied
     placement: 'before' ,         // before | after (does the new markup go before or after the original select?
     selectboxClass: 'selectbox',  // class to apply our markup
+    useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
     
     // markup appended to the display, typically for styling an arrow
     arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'></span></span></span>",
@@ -64,7 +63,7 @@ jQuery.fn.sb = function(o) {
     }
   }, o);
   
-  $sbs.each(function() {
+  $(this).each(function() {
     var $orig = $(this);
     var $sb = null;
     var $display = null;
@@ -139,18 +138,36 @@ jQuery.fn.sb = function(o) {
       $sb.bind("close", closeSB);
       $sb.bind("destroy", destroySB);
       $orig.bind("reload", reloadSB);
+      if(jQuery.fn.tie && o.useTie) {
+        $orig.bind("domchange", delayReloadSB);
+      }
       $orig.focus(focusOrig);
     }
     
     function focusOrig() { $display.focus(); return false; }
     
-    function reloadSB() { destroySB(); loadSB(); }
+    var delayReloadTimeout = null;
+    function delayReloadSB() {
+      clearTimeout(delayReloadTimeout);
+      delayReloadTimeout = setTimeout(reloadSB, 30);
+    }
+    
+    function reloadSB() {
+      var isOpen = $sb.is(".open");
+      instantCloseSB();
+      destroySB();
+      loadSB();
+      if(isOpen) {
+        $display.focus();
+        instantOpenSB();
+      }
+    }
     
     // unbind and remove
     function destroySB() {
       $sb.unbind().find("*").unbind();
       $sb.remove();
-      $orig.unbind("reload", reloadSB).unbind("focus", focusOrig).show();
+      $orig.unbind("reload", reloadSB).unbind("domchange", delayReloadSB).unbind("focus", focusOrig).show();
     }
     
     // when the user clicks outside the sb
@@ -178,6 +195,15 @@ jQuery.fn.sb = function(o) {
         $sb.removeClass("open");
         $sb.append($dd);
       });
+    }
+    
+    function instantCloseSB() {
+      $items.removeClass("hover");
+      $(document).unbind("keyup", keyupSB);
+      $(document).unbind("keydown", stopPageHotkeys);
+      $dd.hide();
+      $sb.removeClass("open");
+      $sb.append($dd);
     }
     
     function getDDCtx() {
@@ -211,6 +237,26 @@ jQuery.fn.sb = function(o) {
       if(dir == "up") $dd.fadeIn(o.animDuration, setScrollFunc);
       else if(dir == "down") $dd.slideDown(o.animDuration, setScrollFunc);
       else $dd.fadeIn(o.animDuration, setScrollFunc);
+      $(document).unbind("keyup", keyupSB).keyup(keyupSB);
+      $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
+      $(document).click(killAndUnbind);
+    }
+    
+    function instantOpenSB() {
+      var $ddCtx = getDDCtx();
+      killAll();
+      $sb.addClass("open");
+      var dir = positionSB();
+      $ddCtx.append($dd);
+      function setScrollFunc() {
+        $dd.scrollTop($items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
+      }
+      if($.browser.msie && $.browser.version < 8) {
+        // fix ie7 display bug
+        $("." + o.selectboxClass + " .display").hide().show();
+      }
+      $dd.show();
+      setScrollFunc();
       $(document).unbind("keyup", keyupSB).keyup(keyupSB);
       $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
       $(document).click(killAndUnbind);
@@ -264,14 +310,15 @@ jQuery.fn.sb = function(o) {
         dir = "down";
       }
       
-      
       // modify dropdown css for display
+      var bodyX = $().jquery < "1.4.2" ? $("body").offset().left : parseInt($("body").css("margin-left"));
+      var bodyY = $().jquery < "1.4.2" ? $("body").offset().top : parseInt($("body").css("margin-top"));
       $dd.css({
         display: "none",
-        left: $display.offsetFrom($ddCtx).left + ($ddCtx[0].tagName.toLowerCase() == "body" ? parseInt($("body").css("margin-left")) : 0),
+        left: $display.offsetFrom($ddCtx).left + ($ddCtx[0].tagName.toLowerCase() == "body" ? bodyX : 0),
         maxHeight: ddMaxHeight,
         position: "absolute",
-        top: ddY + ($ddCtx[0].tagName.toLowerCase() == "body" ? parseInt($("body").css("margin-top")) : 0),
+        top: ddY + ($ddCtx[0].tagName.toLowerCase() == "body" ? bodyY : 0),
         visibility: "visible"
       });
       if(dir == "up") $dd.addClass("above");
