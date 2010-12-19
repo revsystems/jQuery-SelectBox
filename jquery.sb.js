@@ -45,7 +45,6 @@ jQuery.fn.sb = function(o) {
     maxHeight: false,             // if an integer, show scrollbars if the dropdown is too tall
     maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
     noScrollThreshold: 100,       // the minimum height of the dropdown before it can show scrollbars--very rarely applied
-    placement: 'before' ,         // before | after (does the new markup go before or after the original select?
     selectboxClass: 'selectbox',  // class to apply our markup
     useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
     
@@ -116,12 +115,8 @@ jQuery.fn.sb = function(o) {
         $sb.width(o.maxWidth);
       }
       
-      if(o.placement == 'before') {
-        $orig.before($sb);
-      }
-      else if(o.placement == 'after') {
-        $orig.after($sb);
-      }
+      $orig.before($sb);
+      
       // initialize dd and bindings
       $dd.hide();
       if(!$orig.is(":disabled")) {
@@ -154,12 +149,15 @@ jQuery.fn.sb = function(o) {
     
     function reloadSB() {
       var isOpen = $sb.is(".open");
+      var isFocused = $sb.is(":focused");
       instantCloseSB();
       destroySB();
       loadSB();
       if(isOpen) {
-        $display.focus();
         instantOpenSB();
+      }
+      else if(isFocused) {
+        $display.focus();
       }
     }
     
@@ -189,8 +187,8 @@ jQuery.fn.sb = function(o) {
     // hide and reset dropdown markup
     function closeSB() {
       $items.removeClass("hover");
-      $(document).unbind("keyup", keyupSB);
-      $(document).unbind("keydown", stopPageHotkeys);
+      //$(document).unbind("keyup", keyupSB);
+      //$(document).unbind("keydown", stopPageHotkeys);
       $dd.fadeOut(o.animDuration, function() {
         $sb.removeClass("open");
         $sb.append($dd);
@@ -220,6 +218,10 @@ jQuery.fn.sb = function(o) {
       return $ddCtx;
     }
     
+    function centerOnSelected() {
+      $dd.scrollTop($items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
+    }
+    
     // show, reposition, and reset dropdown markup
     function openSB() {
       var $ddCtx = getDDCtx();
@@ -227,19 +229,15 @@ jQuery.fn.sb = function(o) {
       $sb.addClass("open");
       var dir = positionSB();
       $ddCtx.append($dd);
-      function setScrollFunc() {
-        $dd.scrollTop($items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
-      }
       if($.browser.msie && $.browser.version < 8) {
         // fix ie7 display bug
         $("." + o.selectboxClass + " .display").hide().show();
       }
-      if(dir == "up") $dd.fadeIn(o.animDuration, setScrollFunc);
-      else if(dir == "down") $dd.slideDown(o.animDuration, setScrollFunc);
-      else $dd.fadeIn(o.animDuration, setScrollFunc);
-      $(document).unbind("keyup", keyupSB).keyup(keyupSB);
-      $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
+      if(dir == "up") $dd.fadeIn(o.animDuration, centerOnSelected);
+      else if(dir == "down") $dd.slideDown(o.animDuration, centerOnSelected);
+      else $dd.fadeIn(o.animDuration, centerOnSelected);
       $(document).click(killAndUnbind);
+      $display.focus();
     }
     
     function instantOpenSB() {
@@ -248,18 +246,14 @@ jQuery.fn.sb = function(o) {
       $sb.addClass("open");
       var dir = positionSB();
       $ddCtx.append($dd);
-      function setScrollFunc() {
-        $dd.scrollTop($items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
-      }
       if($.browser.msie && $.browser.version < 8) {
         // fix ie7 display bug
         $("." + o.selectboxClass + " .display").hide().show();
       }
       $dd.show();
-      setScrollFunc();
-      $(document).unbind("keyup", keyupSB).keyup(keyupSB);
-      $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
+      centerOnSelected();
       $(document).click(killAndUnbind);
+      $display.focus();
     }
     
     // position dropdown based on collision detection
@@ -333,7 +327,6 @@ jQuery.fn.sb = function(o) {
         $display.focus();
       }
       else {
-        $display.focus();
         openSB();
       }
       return false;
@@ -347,7 +340,13 @@ jQuery.fn.sb = function(o) {
       $display.find(".text").attr("title", $item.find(".text").html());
       $dd.find("li").removeClass("selected");
       $item.closest("li").addClass("selected");
-      $orig.val($item.closest("li").data("val")).change();
+      var oldVal = $orig.val();
+      var newVal = $item.closest("li").data("val");
+      $orig.val(newVal);
+      if(oldVal != newVal) {
+        $orig.change();
+      }
+      centerOnSelected();
     }
     
     // when the user explicitly clicks an item
@@ -392,7 +391,7 @@ jQuery.fn.sb = function(o) {
     }
     
     // go up/down using arrows or attempt to autocomplete based on string
-    function keyupSB(e) {
+    function keydownSB(e) {
       if(e.altKey || e.ctrlKey) return false;
       var $selected = $items.filter(".selected");
       switch(e.which) {
@@ -414,6 +413,13 @@ jQuery.fn.sb = function(o) {
         }
         break;
       default:
+        break;
+      }
+    }
+    function keyupSB(e) {
+      if(e.altKey || e.ctrlKey) return false;
+      var $selected = $items.filter(".selected");
+      if(e.which != 38 && e.which != 40) {
         searchTerm += String.fromCharCode(e.keyCode);
         if(!selectMatchingItem(searchTerm)) {
           clearTimeout(cstTimeout);
@@ -423,19 +429,16 @@ jQuery.fn.sb = function(o) {
           clearTimeout(cstTimeout);
           cstTimeout = setTimeout(clearSearchTerm, o.acTimeout);
         }
-        break;
       }
-      return false;
     }
     
     // when the sb is focused (by tab or click), allow hotkey selection and kill all other selectboxes
     function focusSB() {
       killAllButMe();
       $sb.addClass("focused");
-      if(!$sb.is(".open")) {
-        $(document).unbind("keyup", keyupSB).keyup(keyupSB);
-        $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
-      }
+      $(document).unbind("keyup", keyupSB).keyup(keyupSB);
+      $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
+      $(document).unbind("keydown", keydownSB).keydown(keydownSB);
     }
     
     // when the sb is blurred (by tab or click), disable hotkey selection
@@ -443,6 +446,7 @@ jQuery.fn.sb = function(o) {
       $sb.removeClass("focused");
       $(document).unbind("keyup", keyupSB);
       $(document).unbind("keydown", stopPageHotkeys);
+      $(document).unbind("keydown", keydownSB);
     }
     
     function addHoverState() { $(this).addClass("hover"); }

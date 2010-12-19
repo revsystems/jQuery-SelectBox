@@ -158,10 +158,6 @@ Alternatively, if you don't have control over the function that triggers the rel
       widest dropdown element. If white-space:nowrap is set on dropdown elements, then they will be clipped 
       past the maxWidth.
 
-  **placement** ("before" / "after")
-
-      Markup preference. Determines whether you want to place the markup before or after the existing select.
-
   **selectboxClass** (string)
 
       The class used to identify selectboxes. This is used to kill inactive dropdowns when one is selected.
