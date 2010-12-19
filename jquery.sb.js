@@ -129,7 +129,7 @@ jQuery.fn.sb = function(o) {
         $items.not(".disabled").find("a").click(clickSBItem);
         $items.filter(".disabled").find("a").click(function() { return false; });
         $items.not(".disabled").hover(addHoverState, removeHoverState);
-        $dd.find(".optgroup").hover(addHoverState, removeHoverState);
+        $dd.find(".optgroup").hover(addHoverState, removeHoverState).click(function() { return false; });
       }
       else {
         $sb.addClass("disabled");
