@@ -149,7 +149,7 @@ jQuery.fn.sb = function(o) {
     
     function reloadSB() {
       var isOpen = $sb.is(".open");
-      var isFocused = $display.is(":focused");
+      var isFocused = $display.is(".focused");
       instantCloseSB();
       destroySB();
       loadSB();
@@ -158,7 +158,7 @@ jQuery.fn.sb = function(o) {
         instantOpenSB();
       }
       else if(isFocused) {
-        //$display.focus();
+        $display.focus();
       }
     }
     
