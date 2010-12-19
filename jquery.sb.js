@@ -149,15 +149,16 @@ jQuery.fn.sb = function(o) {
     
     function reloadSB() {
       var isOpen = $sb.is(".open");
-      var isFocused = $sb.is(":focused");
+      var isFocused = $display.is(":focused");
       instantCloseSB();
       destroySB();
       loadSB();
       if(isOpen) {
+        $display.focus();
         instantOpenSB();
       }
       else if(isFocused) {
-        $display.focus();
+        //$display.focus();
       }
     }
     
@@ -187,8 +188,9 @@ jQuery.fn.sb = function(o) {
     // hide and reset dropdown markup
     function closeSB() {
       $items.removeClass("hover");
-      //$(document).unbind("keyup", keyupSB);
-      //$(document).unbind("keydown", stopPageHotkeys);
+      $(document).unbind("keyup", keyupSB);
+      $(document).unbind("keydown", stopPageHotkeys);
+      $(document).unbind("keydown", keydownSB);
       $dd.fadeOut(o.animDuration, function() {
         $sb.removeClass("open");
         $sb.append($dd);
@@ -219,7 +221,7 @@ jQuery.fn.sb = function(o) {
     }
     
     function centerOnSelected() {
-      $dd.scrollTop($items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
+      $dd.scrollTop($dd.scrollTop() + $items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
     }
     
     // show, reposition, and reset dropdown markup
@@ -324,9 +326,9 @@ jQuery.fn.sb = function(o) {
       var $sb = $(this).closest("." + o.selectboxClass);
       if($sb.is(".open")) {
         closeSB();
-        $display.focus();
       }
       else {
+        $display.focus();
         openSB();
       }
       return false;
@@ -346,7 +348,6 @@ jQuery.fn.sb = function(o) {
       if(oldVal != newVal) {
         $orig.change();
       }
-      centerOnSelected();
     }
     
     // when the user explicitly clicks an item
@@ -395,20 +396,39 @@ jQuery.fn.sb = function(o) {
       if(e.altKey || e.ctrlKey) return false;
       var $selected = $items.filter(".selected");
       switch(e.which) {
+      case 35: // end
+        if($selected.size() > 0) {
+          e.preventDefault();
+          selectItem.call($items.not(".disabled").filter(":last")[0]);
+          centerOnSelected();
+        }
+        break;
+      case 36: // home
+        if($selected.size() > 0) {
+          e.preventDefault();
+          selectItem.call($items.not(".disabled").filter(":first")[0]);
+          centerOnSelected();
+        }
+        break;
       case 38: // up
         if($selected.size() > 0) {
           if($items.not(".disabled").filter(":first")[0] != $selected[0]) {
+            e.preventDefault();
             selectItem.call($items.not(".disabled").eq($items.not(".disabled").index($selected)-1)[0]);
           }
+          centerOnSelected();
         }
         break;
       case 40: // down
         if($selected.size() > 0) {
           if($items.not(".disabled").filter(":last")[0] != $selected[0]) {
+            e.preventDefault();
             selectItem.call($items.not(".disabled").eq($items.not(".disabled").index($selected)+1)[0]);
+            centerOnSelected();
           }
         }
         else if($items.size() > 1) {
+          e.preventDefault();
           selectItem.call($items.eq(0)[0]);
         }
         break;
