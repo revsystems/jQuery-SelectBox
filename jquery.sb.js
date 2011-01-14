@@ -31,7 +31,7 @@ jQuery.fn.maxWidth = function() {
     if($(this).width() > max) max = $(this).width();
   });
   return max;
-}
+};
 
 jQuery.fn.sb = function(o) {
   if($.browser.msie && $.browser.version < 7) return $(this);
@@ -91,7 +91,7 @@ jQuery.fn.sb = function(o) {
           });
         }
         else {
-          var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>")
+          var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
           $li.data("val", $(this).attr("value"));
           $dd.append($li);
         }
