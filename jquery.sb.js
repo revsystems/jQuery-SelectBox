@@ -75,7 +75,7 @@ jQuery.fn.sb = function(o) {
       $("body").append($sb);
       $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + o.optionFormat.call($orig.find("option:selected")[0], 0, 0) + "</span>" + o.arrowMarkup + "</a>");
       $sb.append($display);
-      $dd = $("<ul class='items " + $orig.attr("class") + "'></ul>");
+      $dd = $("<ul class='" + o.selectboxClass + " items " + $orig.attr("class") + "'></ul>");
       $sb.append($dd);
       $orig.children().each(function(i) {
         if($(this).is("optgroup")) {
