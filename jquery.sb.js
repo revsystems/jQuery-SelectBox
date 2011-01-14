@@ -61,46 +61,53 @@ jQuery.fn.sb = function(o) {
       return "<span class='label'>" + $(this).attr("label") + "</span>";
     }
   }, o);
-  
+	
   $(this).each(function() {
     var $orig = $(this);
     var $sb = null;
     var $display = null;
     var $dd = null;
     var $items = null;
-    
+		var optionMarkup = $orig.children().length > 0 ? o.optionFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
     function loadSB() {
       // create the new markup from the old
       $sb = $("<div class='" + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
-      $("body").append($sb);
-      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + o.optionFormat.call($orig.find("option:selected")[0], 0, 0) + "</span>" + o.arrowMarkup + "</a>");
-      $sb.append($display);
+    	$("body").append($sb);
+			$display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + optionMarkup + "</span>" + o.arrowMarkup + "</a>");
+    	$sb.append($display);
       $dd = $("<ul class='" + o.selectboxClass + " items " + $orig.attr("class") + "'></ul>");
       $sb.append($dd);
-      $orig.children().each(function(i) {
-        if($(this).is("optgroup")) {
-          var $og = $(this);
-          var $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
-          var $ogList = $("<ul class='items'></ul>");
-          $ogItem.append($ogList);
-          $dd.append($ogItem);
-          $og.children("option").each(function(j) {
-            var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, i+1, j+1) + "</span></a></li>");
-            $li.data("val", $(this).attr("value"));
-            $ogList.append($li);
-          });
-        }
-        else {
-          var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
-          $li.data("val", $(this).attr("value"));
-          $dd.append($li);
-        }
-      });
+			// Adding an empty li if no children are present
+			if ($orig.children().length == 0) {
+				var $empty_li = $("<li class='selected empty'><a href='#'><span class='value'></span><span class='text'>&nbsp;</span></a></li>");
+        $empty_li.data("val", '');
+        $dd.append($empty_li);
+			} else {
+				$orig.children().each(function(i) {
+	        if($(this).is("optgroup")) {
+	          var $og = $(this);
+	          var $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
+	          var $ogList = $("<ul class='items'></ul>");
+	          $ogItem.append($ogList);
+	          $dd.append($ogItem);
+	          $og.children("option").each(function(j) {
+	            var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, i+1, j+1) + "</span></a></li>");
+	            $li.data("val", $(this).attr("value"));
+	            $ogList.append($li);
+	          });
+	        }
+	        else {
+	          var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
+	          $li.data("val", $(this).attr("value"));
+	          $dd.append($li);
+			      $dd.children(":first").addClass("first");
+			      $dd.children(":last").addClass("last");
+	        }
+	      });
+			}
       $items = $dd.find("li").not(".optgroup");
-      $dd.children(":first").addClass("first");
-      $dd.children(":last").addClass("last");
       $orig.hide();
-    
+			
       if(o.fixedWidth) {
         // match display size to largest element
         var largestWidth = $sb.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
@@ -273,7 +280,10 @@ jQuery.fn.sb = function(o) {
         position: "relative",
         visibility: "hidden" 
       });
-      if(o.fixedWidth) $dd.width($display.outerWidth() - $dd.extraWidth() + 1);
+			// setting the dropdown width minimum to the selectbox width
+      if(o.fixedWidth || $dd.width() < $sb.width()) {
+				$dd.width($display.outerWidth() - $dd.extraWidth() + 1);
+			}
       
       // figure out if we should show above/below the display box
       var bottomSpace = $(window).scrollTop() + $(window).height() - $display.offset().top - $display.outerHeight();
