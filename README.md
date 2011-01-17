@@ -95,6 +95,28 @@ Alternatively, if you don't have control over the function that triggers the rel
       $("select").append("<option>Hey! I'm new!</option>");
     });
 
+## Custom Styling
+
+### Making a fixed width selectbox
+
+Say you want to make your selectboxes a fixed width so they line up with the rest of your inputs. Try something like this.
+
+When you initialize jQuery-sb, use the fixedWidth flag:
+
+    $(document).ready(function() {
+      $("select.fixed_width").sb({ fixedWidth: true });
+    });
+    
+In your css, you can add the following to make a selectbox with visual width = 100px:
+
+    .selectbox .display.fixed_width{
+      width:73px;
+      padding:0 24px 0 3px; /* remember padding contributes to the overall width. padding-right is large enough here for the arrow graphic. */
+    }
+    .selectbox.fixed_width.items{
+      width:100px; /* width of display text plus the padding (60 + 27) = 87, so they line up */
+    }
+
 ## Options
   
   View defaults and short descriptions for options in jquery.sb.js. This list is meant to be more 
@@ -142,10 +164,9 @@ Alternatively, if you don't have control over the function that triggers the rel
 
   **fixedWidth**  (boolean)
 
-      If set to true, the width of the select will be variable. In other words, the width of the selected 
-      value will conform to whatever that value is. The width of the dropdown will conform to the widest 
-      dropdown element. By default, this is false, which means the width of the selected value inherits the 
-      width of the dropdown element.
+      False by default.
+      If set to FALSE, the width of the select will be variable, conforming to the longest dropdown value.
+      If set to TRUE, the width should be specified from the site's css.
 
   **maxHeight** (false / positive integer)
   

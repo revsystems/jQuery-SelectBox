@@ -41,18 +41,26 @@ jQuery.fn.sb = function(o) {
     animDuration: 300,            // time to open/close dropdown in ms
     ddCtx: 'body',                // body | self | any selector | a function that returns a selector (the original select is the context)
     dropupThreshold: 150,         // the minimum amount of extra space required above the selectbox for it to display a dropup
-    fixedWidth: true,             // if false, dropdown expands to widest and display conforms to whatever is selected
+    fixedWidth: false,            // if false, dropdown expands to widest and display conforms to whatever is selected
     maxHeight: false,             // if an integer, show scrollbars if the dropdown is too tall
     maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
-    noScrollThreshold: 100,       // the minimum height of the dropdown before it can show scrollbars--very rarely applied
     selectboxClass: 'selectbox',  // class to apply our markup
     useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
     
     // markup appended to the display, typically for styling an arrow
     arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'></span></span></span>",
     
+    // given the selected element of the form <span class='text'>...</span> modify to fit the display as necessary
+    displayFormat: function() {
+      var label = $(this).attr("label");
+      if($.trim(label) != "") return label;
+      return $(this).text();
+    },
+    
     // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
     optionFormat: function(ogIndex, optIndex) {
+      var label = $(this).attr("label");
+      if($.trim(label) != "") return label;
       return $(this).text();
     },
     
@@ -69,39 +77,47 @@ jQuery.fn.sb = function(o) {
     var $dd = null;
     var $items = null;
     
+    var optionMarkup = $orig.children().size() > 0 ? o.optionFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
     function loadSB() {
       // create the new markup from the old
       $sb = $("<div class='" + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
       $("body").append($sb);
-      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + o.optionFormat.call($orig.find("option:selected")[0], 0, 0) + "</span>" + o.arrowMarkup + "</a>");
+      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + optionMarkup  + "</span>" + o.arrowMarkup + "</a>");
       $sb.append($display);
-      $dd = $("<ul class='items " + $orig.attr("class") + "'></ul>");
+      $dd = $("<ul class='" + o.selectboxClass + " items " + $orig.attr("class") + "'></ul>");
       $sb.append($dd);
-      $orig.children().each(function(i) {
-        if($(this).is("optgroup")) {
-          var $og = $(this);
-          var $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
-          var $ogList = $("<ul class='items'></ul>");
-          $ogItem.append($ogList);
-          $dd.append($ogItem);
-          $og.children("option").each(function(j) {
-            var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, i+1, j+1) + "</span></a></li>");
+      if($orig.children().size() == 0) {
+        var $emptyLi = $("<li class='selected empty'><a href='#'><span class='value'></span><span class='text'>&nbsp;</span></a></li>");
+        $emptyLi.data("val", "");
+        $dd.append($emptyLi);
+      }
+      else {
+        $orig.children().each(function(i) {
+          if($(this).is("optgroup")) {
+            var $og = $(this);
+            var $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
+            var $ogList = $("<ul class='items'></ul>");
+            $ogItem.append($ogList);
+            $dd.append($ogItem);
+            $og.children("option").each(function(j) {
+              var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
+              $li.data("val", $(this).attr("value"));
+              $ogList.append($li);
+            });
+          }
+          else {
+            var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>")
             $li.data("val", $(this).attr("value"));
-            $ogList.append($li);
-          });
-        }
-        else {
-          var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>")
-          $li.data("val", $(this).attr("value"));
-          $dd.append($li);
-        }
-      });
+            $dd.append($li);
+          }
+        });
+      }
       $items = $dd.find("li").not(".optgroup");
       $dd.children(":first").addClass("first");
       $dd.children(":last").addClass("last");
       $orig.hide();
     
-      if(o.fixedWidth) {
+      if(!o.fixedWidth) {
         // match display size to largest element
         var largestWidth = $sb.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
         $sb.width(o.maxWidth ? Math.min(o.maxWidth, largestWidth) : largestWidth);
@@ -114,7 +130,6 @@ jQuery.fn.sb = function(o) {
       else if(o.maxWidth && $sb.width() > o.maxWidth) {
         $sb.width(o.maxWidth);
       }
-      
       $orig.before($sb);
       
       // initialize dd and bindings
@@ -262,6 +277,7 @@ jQuery.fn.sb = function(o) {
     function positionSB() {
       var $ddCtx = getDDCtx();
       var ddMaxHeight = 0;
+      var ddX = $display.offsetFrom($ddCtx).left;
       var ddY = 0;
       var dir = "";
       
@@ -273,7 +289,7 @@ jQuery.fn.sb = function(o) {
         position: "relative",
         visibility: "hidden" 
       });
-      if(o.fixedWidth) $dd.width($display.outerWidth() - $dd.extraWidth() + 1);
+      if(!o.fixedWidth) { $dd.width($display.outerWidth() - $dd.extraWidth() + 1); }
       
       // figure out if we should show above/below the display box
       var bottomSpace = $(window).scrollTop() + $(window).height() - $display.offset().top - $display.outerHeight();
@@ -311,7 +327,7 @@ jQuery.fn.sb = function(o) {
       var bodyY = $().jquery < "1.4.2" ? $("body").offset().top : parseInt($("body").css("margin-top"));
       $dd.css({
         display: "none",
-        left: $display.offsetFrom($ddCtx).left + ($ddCtx[0].tagName.toLowerCase() == "body" ? bodyX : 0),
+        left: ddX + ($ddCtx[0].tagName.toLowerCase() == "body" ? bodyX : 0),
         maxHeight: ddMaxHeight,
         position: "absolute",
         top: ddY + ($ddCtx[0].tagName.toLowerCase() == "body" ? bodyY : 0),
@@ -338,13 +354,13 @@ jQuery.fn.sb = function(o) {
     function selectItem() {
       var $item = $(this);
       $display.find(".value").html($item.find(".value").html());
-      $display.find(".text").html($item.find(".text").html());
       $display.find(".text").attr("title", $item.find(".text").html());
       $dd.find("li").removeClass("selected");
       $item.closest("li").addClass("selected");
       var oldVal = $orig.val();
       var newVal = $item.closest("li").data("val");
       $orig.val(newVal);
+      $display.find(".text").html(o.displayFormat.call($orig.find("option:selected")[0]));
       if(oldVal != newVal) {
         $orig.change();
       }

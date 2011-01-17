@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $("select").not("[name=example5]").sb({ ddCtx: function() { return $(this).closest("form"); } });
+  $("[name=example], [name=example2], [name=example3], [name=example4], [name=example5], [name=os0], [name=example7]").sb({ ddCtx: function() { return $(this).closest("form"); } });
   $("select[name=example]").append("<option value='8'>New Option</option>").triggerHandler("reload");
   
   // dynamic examples
@@ -15,4 +15,17 @@ $(document).ready(function() {
   setTimeout(function() {
     $("[name=example5] option:first").attr("disabled", "disabled");
   }, 15000);
+  
+  
+  $("select[name=example6]").sb({
+    displayFormat: function() {
+      if($(this).attr("label")) {
+        return $("<div>").append($($(this).attr("label")).filter("strong")).html();
+      }
+      return $(this).text();
+    }
+  });
+  $("[name=example8], [name=example9]").sb({
+    fixedWidth: true
+  });
 });
