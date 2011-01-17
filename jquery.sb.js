@@ -80,7 +80,7 @@ jQuery.fn.sb = function(o) {
     var optionMarkup = $orig.children().size() > 0 ? o.optionFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
     function loadSB() {
       // create the new markup from the old
-      $sb = $("<div class='" + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
+      $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
       $("body").append($sb);
       $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + optionMarkup  + "</span>" + o.arrowMarkup + "</a>");
       $sb.append($display);
@@ -192,24 +192,30 @@ jQuery.fn.sb = function(o) {
     
     // trigger all sbs to close
     function killAll() {
-      $("." + o.selectboxClass).trigger("close");
+      $(".sb." + o.selectboxClass).each(function() {
+        $(this).triggerHandler("close");
+      });
     }
     
     // to prevent multiple selects open at once
     function killAllButMe() {
-      $("." + o.selectboxClass).not($sb[0]).trigger("close");
+      $(".sb." + o.selectboxClass).not($sb[0]).each(function() {
+        $(this).triggerHandler("close");
+      });
     }
     
     // hide and reset dropdown markup
     function closeSB() {
-      $items.removeClass("hover");
-      $(document).unbind("keyup", keyupSB);
-      $(document).unbind("keydown", stopPageHotkeys);
-      $(document).unbind("keydown", keydownSB);
-      $dd.fadeOut(o.animDuration, function() {
-        $sb.removeClass("open");
-        $sb.append($dd);
-      });
+      if($sb.is(".open")) {
+        $items.removeClass("hover");
+        $(document).unbind("keyup", keyupSB);
+        $(document).unbind("keydown", stopPageHotkeys);
+        $(document).unbind("keydown", keydownSB);
+        $dd.fadeOut(o.animDuration, function() {
+          $sb.removeClass("open");
+          $sb.append($dd);
+        });
+      }
     }
     
     function instantCloseSB() {
