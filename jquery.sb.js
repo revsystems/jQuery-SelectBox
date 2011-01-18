@@ -77,7 +77,10 @@ jQuery.fn.sb = function(o) {
     var $dd = null;
     var $items = null;
     
-    var optionMarkup = $orig.children().size() > 0 ? o.optionFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
+    if($orig.hasClass("has_sb")) { return; }
+    else { $orig.addClass("has_sb"); }
+    
+    var optionMarkup = $orig.children().size() > 0 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
     function loadSB() {
       // create the new markup from the old
       $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
@@ -181,7 +184,7 @@ jQuery.fn.sb = function(o) {
     function destroySB() {
       $sb.unbind().find("*").unbind();
       $sb.remove();
-      $orig.unbind("reload", reloadSB).unbind("domupdate", delayReloadSB).unbind("focus", focusOrig).show();
+      $orig.unbind("reload", reloadSB).unbind("domupdate", delayReloadSB).unbind("focus", focusOrig).removeClass("has_sb").show();
     }
     
     // when the user clicks outside the sb

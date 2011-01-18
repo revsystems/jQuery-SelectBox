@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $("[name=example], [name=example2], [name=example3], [name=example4], [name=example5], [name=os0], [name=example7]").sb({ ddCtx: function() { return $(this).closest("form"); } });
+  $("[name=example], [name=example2], [name=example3], [name=example4], [name=example5], [name=example6], [name=os0], [name=example7]").sb({ ddCtx: function() { return $(this).closest("form"); } });
   $("select[name=example]").append("<option value='8'>New Option</option>").triggerHandler("reload");
   
   // dynamic examples
