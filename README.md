@@ -109,7 +109,7 @@ When you initialize jQuery-sb, use the fixedWidth flag:
     
 In your css, you can add the following to make a selectbox with visual width = 100px:
 
-    .selectbox .display.fixed_width{
+    .selectbox.fixed_width .display{
       width:73px;
       padding:0 24px 0 3px; /* remember padding contributes to the overall width. padding-right is large enough here for the arrow graphic. */
     }
