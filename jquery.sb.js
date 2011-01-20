@@ -80,9 +80,9 @@ jQuery.fn.sb = function(o) {
     if($orig.hasClass("has_sb")) { return; }
     else { $orig.addClass("has_sb"); }
     
-    var optionMarkup = $orig.children().size() > 0 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
     function loadSB() {
       // create the new markup from the old
+      var optionMarkup = $orig.children().size() > 0 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
       $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
       $("body").append($sb);
       $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + optionMarkup  + "</span>" + o.arrowMarkup + "</a>");
