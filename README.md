@@ -10,6 +10,16 @@
 ## Demo
 
   You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
+  
+## TODO
+
+  * Refactor codebase
+    * e.g. $("select").sb("refresh") instead of $("select").triggerHandler("reload")
+    * integrate with jQuery-Proto (coming soon)
+    * integrate with [jQuery-inPixels](http://plugins.jquery.com/project/jquery-inpixels)
+    * Allow option changes after creation
+  * Apply ARIA markup
+  * Create optional skins
 
 ## Features
 

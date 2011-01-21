@@ -52,9 +52,14 @@ jQuery.fn.sb = function(o) {
     
     // given the selected element of the form <span class='text'>...</span> modify to fit the display as necessary
     displayFormat: function() {
-      var label = $(this).attr("label");
-      if($.trim(label) != "") return label;
-      return $(this).text();
+      if($(this).size() > 0) {
+        var label = $(this).attr("label");
+        if($.trim(label) != "") return label;
+        return $(this).text();
+      }
+      else {
+        return "";
+      }
     },
     
     // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
@@ -415,6 +420,21 @@ jQuery.fn.sb = function(o) {
         e.preventDefault();
       }
     }
+    function selectNextItemStartsWith(c) {
+      // get the starting letter of the currently selected item and the item after it
+      // if c matches both, then select the next item
+      var $selected = $items.filter(".selected:first");
+      var st = $selected.find(".text").text().toLowerCase();
+      var $available = $items.not(".disabled");
+      for(var i = $items.not(".disabled").index($selected) + 1; i < $available.size(); i++) {
+        var t = $available.eq(i).find(".text").text();
+        if(t != "" && t.substring(0,1).toLowerCase() == c.toLowerCase()) {
+          selectItem.call($available.eq(i)[0]);
+          return true;
+        }
+      }
+      return false;
+    }
     
     // go up/down using arrows or attempt to autocomplete based on string
     function keydownSB(e) {
@@ -466,13 +486,20 @@ jQuery.fn.sb = function(o) {
       var $selected = $items.filter(".selected");
       if(e.which != 38 && e.which != 40) {
         searchTerm += String.fromCharCode(e.keyCode);
-        if(!selectMatchingItem(searchTerm)) {
-          clearTimeout(cstTimeout);
-          clearSearchTerm();
-        }
-        else {
+        if(searchTerm.length > 0 && selectMatchingItem(searchTerm)) {
+          // we found a match, continue with the current search term
           clearTimeout(cstTimeout);
           cstTimeout = setTimeout(clearSearchTerm, o.acTimeout);
+        }
+        else if(selectNextItemStartsWith(String.fromCharCode(e.keyCode))) {
+          // we got a next item, keep matching with that
+          clearTimeout(cstTimeout);
+          cstTimeout = setTimeout(clearSearchTerm, o.acTimeout);
+        }
+        else {
+          // no matches, clear the search term
+          clearTimeout(cstTimeout);
+          clearSearchTerm();
         }
       }
     }
