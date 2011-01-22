@@ -15,7 +15,6 @@
 
   * Refactor codebase
     * e.g. $("select").sb("refresh") instead of $("select").triggerHandler("reload")
-    * integrate with jQuery-Proto (coming soon)
     * integrate with [jQuery-inPixels](http://plugins.jquery.com/project/jquery-inpixels)
     * Allow option changes after creation
   * Apply ARIA markup
