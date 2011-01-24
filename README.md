@@ -123,7 +123,7 @@ In your css, you can add the following to make a selectbox with visual width = 1
       padding:0 24px 0 3px; /* remember padding contributes to the overall width. padding-right is large enough here for the arrow graphic. */
     }
     .selectbox.fixed_width.items{
-      width:100px; /* width of display text plus the padding (60 + 27) = 87, so they line up */
+      width:100px; /* width of display text plus the padding (73 + 27) = 100, so they line up */
     }
 
 ## Options
