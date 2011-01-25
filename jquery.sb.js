@@ -199,7 +199,7 @@
             $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "' id='sb" + randInt() + "'></div>")
                 .attr("role", "listbox")
                 .attr("aria-has-popup", "true")
-                .attr("aria-labelledby", $label.attr("id"));
+                .attr("aria-labelledby", $label.attr("id") != null ? $label.attr("id") : "");
                 
             $("body").append($sb);
             
