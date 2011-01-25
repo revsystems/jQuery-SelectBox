@@ -440,8 +440,8 @@
                 $ddCtx = getDDCtx();
             blurAllButMe();
             $sb.addClass("open");
-            dir = positionSB();
             $ddCtx.append($dd);
+            dir = positionSB();
             if($.browser.msie && $.browser.version < 8) {
                 $("." + o.selectboxClass + " .display").hide().show(); // fix ie7 display bug
             }
@@ -471,11 +471,10 @@
             
             // modify dropdown css for getting values
             $dd.removeClass("above");
-            $dd.css({
-                display: "block",
+            $dd.show().css({
                 maxHeight: "none",
                 position: "relative",
-                visibility: "hidden" 
+                /* visibility: "hidden" */
             });
             if(!o.fixedWidth) {
               $dd.width($display.outerWidth() - $dd.extraWidth() + 1);
@@ -515,8 +514,7 @@
             bodyY = $().jquery < "1.4.2"
                 ? $("body").offset().top
                 : parseInt($("body").css("margin-top"), 10);
-            $dd.css({
-                display: "none",
+            $dd.hide().css({
                 left: ddX + ($ddCtx[0].tagName.toLowerCase() === "body" ? bodyX : 0),
                 maxHeight: ddMaxHeight,
                 position: "absolute",
