@@ -1,531 +1,791 @@
 /*
-  jQuery-SelectBox
-  
-  Traditional select elements are very difficult to style by themselves, 
-  but they are also very usable and feature rich. This plugin attempts to 
-  recreate all selectbox functionality and appearance while adding 
-  animation and stylability.
-  
-  This product includes software developed 
-  by RevSystems, Inc (http://www.revsystems.com/) and its contributors
-  
-  Please see the accompanying LICENSE.txt for licensing information.
+    jQuery-SelectBox
+    
+    Traditional select elements are very difficult to style by themselves, 
+    but they are also very usable and feature rich. This plugin attempts to 
+    recreate all selectbox functionality and appearance while adding 
+    animation and stylability.
+    
+    This product includes software developed 
+    by RevSystems, Inc (http://www.revsystems.com/) and its contributors
+    
+    Please see the accompanying LICENSE.txt for licensing information.
 */
 
-(function($) {
-
-jQuery.fn.borderWidth = function() { return $(this).outerWidth() - $(this).innerWidth(); };
-jQuery.fn.marginWidth = function() { return $(this).outerWidth(true) - $(this).outerWidth(); };
-jQuery.fn.paddingWidth = function() { return $(this).innerWidth() - $(this).width(); };
-jQuery.fn.extraWidth = function() { return $(this).outerWidth(true) - $(this).width(); };
-jQuery.fn.offsetFrom = function($e) { 
-  return {
-    left: $(this).offset().left - $e.offset().left,
-    top: $(this).offset().top - $e.offset().top
-  };
-};
-
-jQuery.fn.maxWidth = function() {
-  var max = 0;
-  $(this).each(function() {
-    if($(this).width() > max) max = $(this).width();
-  });
-  return max;
-}
-
-jQuery.fn.sb = function(o) {
-  if($.browser.msie && $.browser.version < 7) return $(this);
-  
-  o = $.extend({
-    acTimeout: 800,               // time between each keyup for the user to create a search string
-    animDuration: 300,            // time to open/close dropdown in ms
-    ddCtx: 'body',                // body | self | any selector | a function that returns a selector (the original select is the context)
-    dropupThreshold: 150,         // the minimum amount of extra space required above the selectbox for it to display a dropup
-    fixedWidth: false,            // if false, dropdown expands to widest and display conforms to whatever is selected
-    maxHeight: false,             // if an integer, show scrollbars if the dropdown is too tall
-    maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
-    selectboxClass: 'selectbox',  // class to apply our markup
-    useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
+(function( $ ) {
+    // utility functions
+    $.fn.borderWidth = function() { return $(this).outerWidth() - $(this).innerWidth(); };
+    $.fn.paddingWidth = function() { return $(this).innerWidth() - $(this).width(); };
+    $.fn.extraWidth = function() { return $(this).outerWidth(true) - $(this).width(); };
+    $.fn.offsetFrom = function( e ) {
+        var $e = $(e);
+        return {
+            left: $(this).offset().left - $e.offset().left,
+            top: $(this).offset().top - $e.offset().top
+        };
+    };
+    $.fn.maxWidth = function() {
+        var max = 0;
+        $(this).each(function() {
+            if($(this).width() > max) {
+              max = $(this).width();
+            }
+        });
+        return max;
+    };
+    $.fn.triggerAll = function(event, params) {
+      return $(this).each(function() {
+        $(this).triggerHandler(event, params);
+      });
+    };
     
-    // markup appended to the display, typically for styling an arrow
-    arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'></span></span></span>",
-    
-    // given the selected element of the form <span class='text'>...</span> modify to fit the display as necessary
-    displayFormat: function() {
-      if($(this).size() > 0) {
-        var label = $(this).attr("label");
-        if($.trim(label) != "") return label;
-        return $(this).text();
-      }
-      else {
-        return "";
-      }
-    },
-    
-    // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
-    optionFormat: function(ogIndex, optIndex) {
-      var label = $(this).attr("label");
-      if($.trim(label) != "") return label;
-      return $(this).text();
-    },
-    
-    // the function to produce optgroup markup
-    optgroupFormat: function(ogIndex) {
-      return "<span class='label'>" + $(this).attr("label") + "</span>";
-    }
-  }, o);
-  
-  $(this).each(function() {
-    var $orig = $(this);
-    var $sb = null;
-    var $display = null;
-    var $dd = null;
-    var $items = null;
-    
-    if($orig.hasClass("has_sb")) { return; }
-    else { $orig.addClass("has_sb"); }
-    
-    function loadSB() {
-      // create the new markup from the old
-      var optionMarkup = $orig.children().size() > 0 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0) : "&nbsp;";
-      $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
-      $("body").append($sb);
-      $display = $("<a href='#' class='display " + $orig.attr("class") + "'><span class='value'>" + $orig.val() + "</span> <span class='text'>" + optionMarkup  + "</span>" + o.arrowMarkup + "</a>");
-      $sb.append($display);
-      $dd = $("<ul class='" + o.selectboxClass + " items " + $orig.attr("class") + "'></ul>");
-      $sb.append($dd);
-      if($orig.children().size() == 0) {
-        var $emptyLi = $("<li class='selected empty'><a href='#'><span class='value'></span><span class='text'>&nbsp;</span></a></li>");
-        $emptyLi.data("val", "");
-        $dd.append($emptyLi);
-      }
-      else {
-        $orig.children().each(function(i) {
-          if($(this).is("optgroup")) {
-            var $og = $(this);
-            var $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
-            var $ogList = $("<ul class='items'></ul>");
-            $ogItem.append($ogList);
-            $dd.append($ogItem);
-            $og.children("option").each(function(j) {
-              var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>");
-              $li.data("val", $(this).attr("value"));
-              $ogList.append($li);
+    // jQuery-Proto
+    var aps = Array.prototype.slice;
+    $.proto = function() {
+        var name = arguments[0],    // The name of the jQuery function that will be called
+            clazz = arguments[1],   // A reference to the class that you are associating
+            klazz = clazz,          // A version of clazz with a delayed constructor
+            extOpt = {};            // used to extend clazz with a variable name for the init function
+        
+        opts = $.extend({
+            elem: "elem",
+            access: "access",
+            init: "init"
+        }, arguments[2]);
+        
+        if(clazz._super) {
+            extOpt[opts.init] = function(){};
+            klazz = clazz.extend(extOpt);
+        }
+        
+        $.fn[name] = function() {
+            
+            var result, args = arguments;
+                
+            $(this).each(function() {
+                var res,
+                    $e = $(this),
+                    obj = $e.data(name);
+                
+                // if the object is not defined for this element
+                if(obj === undefined) {
+                    
+                    // create the new object and restore init if necessary
+                    obj = new klazz();
+                    if(clazz._super) {
+                      obj[opts.init] = clazz.prototype.init;
+                    }
+                    
+                    // set the elem property and initialize the object
+                    obj[opts.elem] = $e[0];
+                    if(obj[opts.init]) {
+                        obj[opts.init].apply(obj, aps.call(args, 0));
+                    }
+                    
+                    // associate it with the element
+                    $e.data(name, obj);
+                    
+                } else {
+                  
+                    // call the access function if it exists (allows lazy loading)
+                    if(obj[opts.access]) {
+                        obj[opts.access].apply(obj, aps.call(args, 0));
+                    }
+                    
+                    // do something with the object
+                    if(args.length > 0) {
+                    
+                        if($.isFunction(obj[args[0]])) {
+                        
+                            // use the method access interface
+                            res = obj[args[0]].apply(obj, aps.call(args, 1));
+                            result = res;
+                            
+                        } else if(args.length === 1) {
+                          
+                            // just retrieve the property (leverage deep access with getObject if we can)
+                            if($.getObject) {
+                              result = $.getObject(args[0], obj);
+                            } else {
+                              result = obj[args[0]];
+                            }
+                            
+                        } else {
+                          
+                            // set the property (leverage deep access with setObject if we can)
+                            if($.setObject) {
+                              $.setObject(args[0], args[1], obj);
+                            } else {
+                              obj[args[0]] = args[1];
+                            }
+                            
+                        }
+                        
+                    } else if(result === undefined) {
+                    
+                        // return the first object if there are no args
+                        result = $e.data(name);
+                        
+                    }
+                }
             });
-          }
-          else {
-            var $li = $("<li class='" + ($(this).attr("selected") ? "selected" : "" ) + " " + ($(this).attr("disabled") ? "disabled" : "" ) + "'><a href='#'><span class='value'>" + $(this).attr("value") + "</span><span class='text'>" + o.optionFormat.call(this, 0, i+1) + "</span></a></li>")
-            $li.data("val", $(this).attr("value"));
-            $dd.append($li);
-          }
-        });
-      }
-      $items = $dd.find("li").not(".optgroup");
-      $dd.children(":first").addClass("first");
-      $dd.children(":last").addClass("last");
-      $orig.hide();
+            
+            // chain if no results were returned from the clazz's method (it's a setter)
+            if(result !== undefined) {
+              return $(this);
+            }
+            
+            // return the first result
+            return result;
+        };
+    };
     
-      if(!o.fixedWidth) {
-        // match display size to largest element
-        var largestWidth = $sb.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
-        $sb.width(o.maxWidth ? Math.min(o.maxWidth, largestWidth) : largestWidth);
-        if($.browser.msie && $.browser.version <= 7) {
-          $items.find("a").each(function() {
-            $(this).css("width", "100%").width($(this).width() - $(this).paddingWidth() - $(this).borderWidth());
-          });
-        }
-      }
-      else if(o.maxWidth && $sb.width() > o.maxWidth) {
-        $sb.width(o.maxWidth);
-      }
-      $orig.before($sb);
-      
-      // initialize dd and bindings
-      $dd.hide();
-      if(!$orig.is(":disabled")) {
-        $display.click(clickSB).focus(focusSB).blur(blurSB).hover(addHoverState, removeHoverState);
-        $items.not(".disabled").find("a").click(clickSBItem);
-        $items.filter(".disabled").find("a").click(function() { return false; });
-        $items.not(".disabled").hover(addHoverState, removeHoverState);
-        $dd.find(".optgroup").hover(addHoverState, removeHoverState).click(function() { return false; });
-      }
-      else {
-        $sb.addClass("disabled");
-        $display.click(function(e) { e.preventDefault(); });
-      }
-      $sb.bind("close", closeSB);
-      $sb.bind("destroy", destroySB);
-      $orig.bind("reload", reloadSB);
-      if(jQuery.fn.tie && o.useTie) {
-        $orig.bind("domupdate", delayReloadSB);
-      }
-      $orig.focus(focusOrig);
-    }
-    
-    function focusOrig() { $display.focus(); return false; }
-    
-    var delayReloadTimeout = null;
-    function delayReloadSB() {
-      clearTimeout(delayReloadTimeout);
-      delayReloadTimeout = setTimeout(reloadSB, 30);
-    }
-    
-    function reloadSB() {
-      var isOpen = $sb.is(".open");
-      var isFocused = $display.is(".focused");
-      instantCloseSB();
-      destroySB();
-      loadSB();
-      if(isOpen) {
-        $display.focus();
-        instantOpenSB();
-      }
-      else if(isFocused) {
-        $display.focus();
-      }
-    }
-    
-    // unbind and remove
-    function destroySB() {
-      $sb.unbind().find("*").unbind();
-      $sb.remove();
-      $orig.unbind("reload", reloadSB).unbind("domupdate", delayReloadSB).unbind("focus", focusOrig).removeClass("has_sb").show();
-    }
-    
-    // when the user clicks outside the sb
-    function killAndUnbind() {
-      killAll();
-      $(document).unbind("click", killAndUnbind);
-    }
-    
-    // trigger all sbs to close
-    function killAll() {
-      $(".sb." + o.selectboxClass).each(function() {
-        $(this).triggerHandler("close");
-      });
-    }
-    
-    // to prevent multiple selects open at once
-    function killAllButMe() {
-      $(".sb." + o.selectboxClass).not($sb[0]).each(function() {
-        $(this).triggerHandler("close");
-      });
-    }
-    
-    // hide and reset dropdown markup
-    function closeSB() {
-      if($sb.is(".open")) {
-        $items.removeClass("hover");
-        $(document).unbind("keyup", keyupSB);
-        $(document).unbind("keydown", stopPageHotkeys);
-        $(document).unbind("keydown", keydownSB);
-        $dd.fadeOut(o.animDuration, function() {
-          $sb.removeClass("open");
-          $sb.append($dd);
-        });
-      }
-    }
-    
-    function instantCloseSB() {
-      $items.removeClass("hover");
-      $(document).unbind("keyup", keyupSB);
-      $(document).unbind("keydown", stopPageHotkeys);
-      $dd.hide();
-      $sb.removeClass("open");
-      $sb.append($dd);
-    }
-    
-    function getDDCtx() {
-      var $ddCtx = null;
-      if(o.ddCtx == "self") {
-        $ddCtx = $sb;
-      }
-      else if($.isFunction(o.ddCtx)) {
-        $ddCtx = $(o.ddCtx.call($orig[0]));
-      }
-      else {
-        $ddCtx = $(o.ddCtx);
-      }
-      return $ddCtx;
-    }
-    
-    function centerOnSelected() {
-      $dd.scrollTop($dd.scrollTop() + $items.filter(".selected").offsetFrom($dd).top - $dd.height() / 2 + $items.filter(".selected").outerHeight(true) / 2);
-    }
-    
-    // show, reposition, and reset dropdown markup
-    function openSB() {
-      var $ddCtx = getDDCtx();
-      killAll();
-      $sb.addClass("open");
-      var dir = positionSB();
-      $ddCtx.append($dd);
-      if($.browser.msie && $.browser.version < 8) {
-        // fix ie7 display bug
-        $("." + o.selectboxClass + " .display").hide().show();
-      }
-      if(dir == "up") $dd.fadeIn(o.animDuration, centerOnSelected);
-      else if(dir == "down") $dd.slideDown(o.animDuration, centerOnSelected);
-      else $dd.fadeIn(o.animDuration, centerOnSelected);
-      $(document).click(killAndUnbind);
-      $display.focus();
-    }
-    
-    function instantOpenSB() {
-      var $ddCtx = getDDCtx();
-      killAll();
-      $sb.addClass("open");
-      var dir = positionSB();
-      $ddCtx.append($dd);
-      if($.browser.msie && $.browser.version < 8) {
-        // fix ie7 display bug
-        $("." + o.selectboxClass + " .display").hide().show();
-      }
-      $dd.show();
-      centerOnSelected();
-      $(document).click(killAndUnbind);
-      $display.focus();
-    }
-    
-    // position dropdown based on collision detection
-    function positionSB() {
-      var $ddCtx = getDDCtx();
-      var ddMaxHeight = 0;
-      var ddX = $display.offsetFrom($ddCtx).left;
-      var ddY = 0;
-      var dir = "";
-      
-      // modify dropdown css for getting values
-      $dd.removeClass("above");
-      $dd.css({
-        display: "block",
-        maxHeight: "none",
-        position: "relative",
-        visibility: "hidden" 
-      });
-      if(!o.fixedWidth) { $dd.width($display.outerWidth() - $dd.extraWidth() + 1); }
-      
-      // figure out if we should show above/below the display box
-      var bottomSpace = $(window).scrollTop() + $(window).height() - $display.offset().top - $display.outerHeight();
-      var topSpace = $display.offset().top - $(window).scrollTop();
-      var bottomOffset = $display.offsetFrom($ddCtx).top + $display.outerHeight();
-      var spaceDiff = bottomSpace - topSpace + o.dropupThreshold;
-      if($dd.outerHeight() < bottomSpace) {
-        ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
-        ddY = bottomOffset;
-        dir = "down";
-      }
-      else if($dd.outerHeight() < topSpace) {
-        ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
-        ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
-        dir = "up";
-      }
-      else if(spaceDiff >= 0) {
-        ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
-        ddY = bottomOffset;
-        dir = "down";
-      }
-      else if(spaceDiff < 0) {
-        ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
-        ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
-        dir = "up";
-      }
-      else {
-        ddMaxHeight = o.maxHeight ? o.maxHeight : "none";
-        ddY = bottomOffset;
-        dir = "down";
-      }
-      
-      // modify dropdown css for display
-      var bodyX = $().jquery < "1.4.2" ? $("body").offset().left : parseInt($("body").css("margin-left"));
-      var bodyY = $().jquery < "1.4.2" ? $("body").offset().top : parseInt($("body").css("margin-top"));
-      $dd.css({
-        display: "none",
-        left: ddX + ($ddCtx[0].tagName.toLowerCase() == "body" ? bodyX : 0),
-        maxHeight: ddMaxHeight,
-        position: "absolute",
-        top: ddY + ($ddCtx[0].tagName.toLowerCase() == "body" ? bodyY : 0),
-        visibility: "visible"
-      });
-      if(dir == "up") $dd.addClass("above");
-      return dir;
-    }
-    
-    // when the user explicitly clicks the display
-    function clickSB(e) {
-      var $sb = $(this).closest("." + o.selectboxClass);
-      if($sb.is(".open")) {
-        closeSB();
-      }
-      else {
-        $display.focus();
-        openSB();
-      }
-      return false;
-    }
-    
-    // when the user selects an item in any manner
-    function selectItem() {
-      var $item = $(this);
-      $display.find(".value").html($item.find(".value").html());
-      $display.find(".text").attr("title", $item.find(".text").html());
-      $dd.find("li").removeClass("selected");
-      $item.closest("li").addClass("selected");
-      var oldVal = $orig.val();
-      var newVal = $item.closest("li").data("val");
-      $orig.val(newVal);
-      $display.find(".text").html(o.displayFormat.call($orig.find("option:selected")[0]));
-      if(oldVal != newVal) {
-        $orig.change();
-      }
-    }
-    
-    // when the user explicitly clicks an item
-    function clickSBItem(e) {
-      selectItem.call(this);
-      killAndUnbind();
-      $display.focus();
-      return false;
-    }
-    
-    // helper functions for matching on keyup
-    var searchTerm = "";
-    var cstTimeout = null;
-    function clearSearchTerm() {
-      searchTerm = "";
-    }
-    function findMatchingItem(term) {
-      var ts = "";
-      var $available = $items.not(".disabled");
-      for(var i=0; i < $available.size(); i++) {
-        var t = $available.eq(i).find(".text").text();
-        ts += t + " ";
-        if(t.toLowerCase().match("^" + term.toLowerCase()) == term.toLowerCase()) {
-          return $available.eq(i);
-        }
-      }
-      return null;
-    }
-    function selectMatchingItem(text) {
-      var $matchingItem = findMatchingItem(text);
-      if($matchingItem != null) {
-        selectItem.call($matchingItem[0]);
-        return true;
-      }
-      return false;
-    }
-    function stopPageHotkeys(e) {
-      // Stop up/down/backspace/space from moving the page
-      if(e.which == 38 || e.which == 40 || e.which == 8 || e.which == 32) {
-        e.preventDefault();
-      }
-    }
-    function selectNextItemStartsWith(c) {
-      // get the starting letter of the currently selected item and the item after it
-      // if c matches both, then select the next item
-      var $selected = $items.filter(".selected:first");
-      var st = $selected.find(".text").text().toLowerCase();
-      var $available = $items.not(".disabled");
-      for(var i = $items.not(".disabled").index($selected) + 1; i < $available.size(); i++) {
-        var t = $available.eq(i).find(".text").text();
-        if(t != "" && t.substring(0,1).toLowerCase() == c.toLowerCase()) {
-          selectItem.call($available.eq(i)[0]);
-          return true;
-        }
-      }
-      return false;
-    }
-    
-    // go up/down using arrows or attempt to autocomplete based on string
-    function keydownSB(e) {
-      if(e.altKey || e.ctrlKey) return false;
-      var $selected = $items.filter(".selected");
-      switch(e.which) {
-      case 35: // end
-        if($selected.size() > 0) {
-          e.preventDefault();
-          selectItem.call($items.not(".disabled").filter(":last")[0]);
-          centerOnSelected();
-        }
-        break;
-      case 36: // home
-        if($selected.size() > 0) {
-          e.preventDefault();
-          selectItem.call($items.not(".disabled").filter(":first")[0]);
-          centerOnSelected();
-        }
-        break;
-      case 38: // up
-        if($selected.size() > 0) {
-          if($items.not(".disabled").filter(":first")[0] != $selected[0]) {
-            e.preventDefault();
-            selectItem.call($items.not(".disabled").eq($items.not(".disabled").index($selected)-1)[0]);
-          }
-          centerOnSelected();
-        }
-        break;
-      case 40: // down
-        if($selected.size() > 0) {
-          if($items.not(".disabled").filter(":last")[0] != $selected[0]) {
-            e.preventDefault();
-            selectItem.call($items.not(".disabled").eq($items.not(".disabled").index($selected)+1)[0]);
-            centerOnSelected();
-          }
-        }
-        else if($items.size() > 1) {
-          e.preventDefault();
-          selectItem.call($items.eq(0)[0]);
-        }
-        break;
-      default:
-        break;
-      }
-    }
-    function keyupSB(e) {
-      if(e.altKey || e.ctrlKey) return false;
-      var $selected = $items.filter(".selected");
-      if(e.which != 38 && e.which != 40) {
-        searchTerm += String.fromCharCode(e.keyCode);
-        if(searchTerm.length > 0 && selectMatchingItem(searchTerm)) {
-          // we found a match, continue with the current search term
-          clearTimeout(cstTimeout);
-          cstTimeout = setTimeout(clearSearchTerm, o.acTimeout);
-        }
-        else if(selectNextItemStartsWith(String.fromCharCode(e.keyCode))) {
-          // we got a next item, keep matching with that
-          clearTimeout(cstTimeout);
-          cstTimeout = setTimeout(clearSearchTerm, o.acTimeout);
-        }
-        else {
-          // no matches, clear the search term
-          clearTimeout(cstTimeout);
-          clearSearchTerm();
-        }
-      }
-    }
-    
-    // when the sb is focused (by tab or click), allow hotkey selection and kill all other selectboxes
-    function focusSB() {
-      killAllButMe();
-      $sb.addClass("focused");
-      $(document).unbind("keyup", keyupSB).keyup(keyupSB);
-      $(document).unbind("keydown", stopPageHotkeys).keydown(stopPageHotkeys);
-      $(document).unbind("keydown", keydownSB).keydown(keydownSB);
-    }
-    
-    // when the sb is blurred (by tab or click), disable hotkey selection
-    function blurSB() {
-      $sb.removeClass("focused");
-      $(document).unbind("keyup", keyupSB);
-      $(document).unbind("keydown", stopPageHotkeys);
-      $(document).unbind("keydown", keydownSB);
-    }
-    
-    function addHoverState() { $(this).addClass("hover"); }
-    function removeHoverState() { $(this).removeClass("hover"); }
-    
-    loadSB();
-  });
-};
+    var falseFunc = function() {
+            return false;
+        },
+        SelectBox = function() {
+        
+        var self = this,
+            o = {},
+            $orig = null,
+            $sb = null,
+            $display = null,
+            $dd = null,
+            $items = null,
+            searchTerm = "",
+            cstTimeout = null,
+            delayReloadTimeout = null,
+            
+            // functions
+            loadSB,
+            createOption,
+            focusOrig,
+            destroySB,
+            reloadSB,
+            delayReloadSB,
+            openSB,
+            centerOnSelected,
+            closeSB,
+            positionSB,
+            clickSB,
+            clickSBItem,
+            keyupSB,
+            keydownSB,
+            focusSB,
+            blurSB,
+            addHoverState,
+            removeHoverState,
+            getDDCtx,
+            getSelected,
+            getEnabled,
+            selectItem,
+            clearSearchTerm,
+            findMatchingItem,
+            selectMatchingItem,
+            selectNextItemStartsWith,
+            closeAll,
+            closeAllButMe,
+            closeAndUnbind,
+            blurAllButMe,
+            stopPageHotkeys;
+        
+        loadSB = function() {
+            var displayMarkup;
+            
+            // create the new sb
+            $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
+            $("body").append($sb);
+            
+            // generate the display markup
+            displayMarkup = $orig.children().size() > 0
+                ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0)
+                : "&nbsp;";
+            $display = $("<a href='#' class='display " + $orig.attr("class") + "'></a>")
+                .append("<div class='text'>" + displayMarkup + "</div>")
+                .append(o.arrowMarkup);
+            $sb.append($display);
+            
+            // generate the dropdown markup
+            $dd = $("<ul class='" + o.selectboxClass + " items " + $orig.attr("class") + "'></ul>");
+            $sb.append($dd);
+            if($orig.children().size() === 0) {
+                $dd.append(createOption());
+            } else {
+                $orig.children().each(function( i ) {
+                    var $og, $ogItem, $ogList;
+                    if($(this).is("optgroup")) {
+                        $og = $(this);
+                        $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
+                        $ogList = $("<ul class='items'></ul>");
+                        $ogItem.append($ogList);
+                        $dd.append($ogItem);
+                        $og.children("option").each(function() {
+                            $ogList.append(createOption($(this), i));
+                        });
+                    } else {
+                        $dd.append(createOption($(this), i));
+                    }
+                });
+            }
+            
+            // cache all sb items
+            $items = $dd.find("li").not(".optgroup");
+            
+            // for styling
+            $dd.children(":first").addClass("first");
+            $dd.children(":last").addClass("last");
+            
+            // hide the original
+            $orig.hide();
+            
+            // modify width based on fixedWidth/maxWidth options
+            if(!o.fixedWidth) {
+                var largestWidth = $sb.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
+                $sb.width(o.maxWidth ? Math.min(o.maxWidth, largestWidth) : largestWidth);
+                if($.browser.msie && $.browser.version <= 7) {
+                    $items.find("a").each(function() {
+                        $(this).css("width", "100%").width($(this).width() - $(this).paddingWidth() - $(this).borderWidth());
+                    });
+                }
+            } else if(o.maxWidth && $sb.width() > o.maxWidth) {
+                $sb.width(o.maxWidth);
+            }
+            
+            // place the new markup in its semantic location
+            $orig.before($sb);
+            
+            // hide the dropdown now that it's initialized
+            $dd.hide();
+            
+            // bind events
+            if(!$orig.is(":disabled")) {
+                $orig.focus(focusOrig);
+                $display
+                    .mousedown(clickSB)
+                    .click(falseFunc)
+                    .focus(focusSB)
+                    .blur(blurSB)
+                    .hover(addHoverState, removeHoverState);
+                getEnabled()
+                    .click(clickSBItem)
+                    .hover(addHoverState, removeHoverState);
+                $dd.find(".optgroup")
+                    .hover(addHoverState, removeHoverState)
+                    .click(falseFunc);
+                $items.filter(".disabled")
+                    .click(falseFunc);
+            } else {
+                $sb.addClass("disabled");
+                $display.click(function( e ) { e.preventDefault(); });
+            }
+            
+            // bind custom events
+            $sb.bind("close.sb", closeSB)
+                .bind("destroy.sb", destroySB);
+            $orig.bind("reload.sb", reloadSB);
+            if($.fn.tie && o.useTie) {
+                $orig.bind("domupdate.sb", delayReloadSB);
+            }
+        };
+        
+        // create new markup from an <option>
+        createOption = function( $option, index ) {
+            if(!$option) { 
+                $option = $("<option value=''>&nbsp;</option>");
+                index = 0;
+            }
+            var $li = $("<li></li>")
+                    .data("value", $option ? $option.attr("value") : "")
+                    .addClass($option.is(":selected") ? "selected" : "")
+                    .addClass($option.is(":disabled") ? "disabled" : ""),
+                $inner = $("<div class='item'></div>"),
+                $text = $("<div class='text'></div>")
+                    .html(o.optionFormat.call($option[0], 0, index + 1));
+            return $li.append($inner.append($text));
+        };
+        
+        // theoretically causes focus if the label is clicked -- untested
+        focusOrig = function() {
+          $display.focus();
+        };
+        
+        // unbind and remove
+        destroySB = function() {
+            $sb.remove();
+            $orig.unbind("reload.sb", reloadSB)
+                .unbind("domupdate.sb", delayReloadSB)
+                .unbind("focus.sb", focusOrig)
+                .removeClass("has_sb")
+                .show();
+            $orig.removeData(self.id);
+        };
+        
+        // destroy then load, maintaining open/focused state if applicable
+        reloadSB = function() {
+            var isOpen = $sb.is(".open"),
+                isFocused = $display.is(".focused");
+            closeSB(true);
+            destroySB();
+            self.init(o);
+            if(isOpen) {
+                $display.focus();
+                openSB(true);
+            } else if(isFocused) {
+                $display.focus();
+            }
+        };
+        
+        // debouncing when useTie === true
+        delayReloadSB = function() {
+            clearTimeout(delayReloadTimeout);
+            delayReloadTimeout = setTimeout(reloadSB, 30);
+        };
+        
+        // when the user clicks outside the sb
+        closeAndUnbind = function() {
+            closeSB();
+            $(document).unbind("click", closeAndUnbind);
+        };
+        
+        // trigger all sbs to close
+        closeAll = function() {
+            $(".sb.open." + o.selectboxClass).triggerAll("close");
+        };
+        
+        // trigger all sbs to blur
+        blurAllButMe = function() {
+            $(".sb.focused." + o.selectboxClass).not($sb[0]).find(".display").blur();
+        };
+        
+        // to prevent multiple selects open at once
+        closeAllButMe = function() {
+            $(".sb.open." + o.selectboxClass).not($sb[0]).triggerAll("close");
+        };
+        
+        // hide and reset dropdown markup
+        closeSB = function( instantClose ) {
+            if($sb.is(".open")) {
+                $display.blur();
+                $items.removeClass("hover");
+                $(document)
+                    .unbind("keyup", keyupSB)
+                    .unbind("keydown", stopPageHotkeys)
+                    .unbind("keydown", keydownSB);
+                if(instantClose === true) {
+                  $dd.hide();
+                  $sb.removeClass("open");
+                  $sb.append($dd);
+                } else {
+                    $dd.fadeOut(o.animDuration, function() {
+                        $sb.removeClass("open");
+                        $sb.append($dd);
+                    });
+                }
+            }
+        };
+        
+        // since the context can change, we should get it dynamically
+        getDDCtx = function() {
+            var $ddCtx = null;
+            if(o.ddCtx === "self") {
+                $ddCtx = $sb;
+            } else if($.isFunction(o.ddCtx)) {
+                $ddCtx = $(o.ddCtx.call($orig[0]));
+            } else {
+                $ddCtx = $(o.ddCtx);
+            }
+            return $ddCtx;
+        };
+        
+        // DRY
+        getSelected = function() {
+          return $items.filter(".selected");
+        };
+        
+        // DRY
+        getEnabled = function() {
+          return $items.not(".disabled");
+        };
+        
+        // reposition the scroll of the dropdown so the selected option is centered (or appropriately onscreen)
+        centerOnSelected = function() {
+            $dd.scrollTop($dd.scrollTop() + getSelected().offsetFrom($dd).top - $dd.height() / 2 + getSelected().outerHeight(true) / 2);
+        };
+        
+        // show, reposition, and reset dropdown markup
+        openSB = function( instantOpen ) {
+            var dir,
+                $ddCtx = getDDCtx();
+            blurAllButMe();
+            $sb.addClass("open");
+            dir = positionSB();
+            $ddCtx.append($dd);
+            if($.browser.msie && $.browser.version < 8) {
+                $("." + o.selectboxClass + " .display").hide().show(); // fix ie7 display bug
+            }
+            if(instantOpen === true) {
+                $dd.show();
+                centerOnSelected();
+            } else if(dir === "down") {
+                $dd.slideDown(o.animDuration, centerOnSelected);
+            } else {
+                $dd.fadeIn(o.animDuration, centerOnSelected);
+            }
+            $(document).click(closeAndUnbind);
+            $display.focus();
+        };
+        
+        // position dropdown based on collision detection
+        positionSB = function() {
+            var $ddCtx = getDDCtx(),
+                ddMaxHeight = 0,
+                ddX = $display.offsetFrom($ddCtx).left,
+                ddY = 0,
+                dir = "",
+                bottomSpace, topSpace,
+                bottomOffset, spaceDiff,
+                bodyX, bodyY;
+            
+            // modify dropdown css for getting values
+            $dd.removeClass("above");
+            $dd.css({
+                display: "block",
+                maxHeight: "none",
+                position: "relative",
+                visibility: "hidden" 
+            });
+            if(!o.fixedWidth) {
+              $dd.width($display.outerWidth() - $dd.extraWidth() + 1);
+            }
+            
+            // figure out if we should show above/below the display box
+            bottomSpace = $(window).scrollTop() + $(window).height() - $display.offset().top - $display.outerHeight();
+            topSpace = $display.offset().top - $(window).scrollTop();
+            bottomOffset = $display.offsetFrom($ddCtx).top + $display.outerHeight();
+            spaceDiff = bottomSpace - topSpace + o.dropupThreshold;
+            if($dd.outerHeight() < bottomSpace) {
+                ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
+                ddY = bottomOffset;
+                dir = "down";
+            } else if($dd.outerHeight() < topSpace) {
+                ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
+                ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
+                dir = "up";
+            } else if(spaceDiff >= 0) {
+                ddMaxHeight = o.maxHeight ? o.maxHeight : bottomSpace;
+                ddY = bottomOffset;
+                dir = "down";
+            } else if(spaceDiff < 0) {
+                ddMaxHeight = o.maxHeight ? o.maxHeight : topSpace;
+                ddY = $display.offsetFrom($ddCtx).top - Math.min(ddMaxHeight, $dd.outerHeight());
+                dir = "up";
+            } else {
+                ddMaxHeight = o.maxHeight ? o.maxHeight : "none";
+                ddY = bottomOffset;
+                dir = "down";
+            }
+            
+            // modify dropdown css for display
+            bodyX = $().jquery < "1.4.2"
+                ? $("body").offset().left
+                : parseInt($("body").css("margin-left"), 10);
+            bodyY = $().jquery < "1.4.2"
+                ? $("body").offset().top
+                : parseInt($("body").css("margin-top"), 10);
+            $dd.css({
+                display: "none",
+                left: ddX + ($ddCtx[0].tagName.toLowerCase() === "body" ? bodyX : 0),
+                maxHeight: ddMaxHeight,
+                position: "absolute",
+                top: ddY + ($ddCtx[0].tagName.toLowerCase() === "body" ? bodyY : 0),
+                visibility: "visible"
+            });
+            if(dir === "up") {
+              $dd.addClass("above");
+            }
+            return dir;
+        };
+        
+        // when the user explicitly clicks the display
+        clickSB = function( e ) {
+            if($sb.is(".open")) {
+                closeSB();
+            } else {
+                openSB();
+            }
+            return false;
+        };
+        
+        // when the user selects an item in any manner
+        selectItem = function() {
+            var $item = $(this),
+                oldVal = $orig.val(),
+                newVal = $item.data("value");
+            
+            // update the original <select>
+            $orig.val(newVal);
+            
+            // change the selection to this item
+            $dd.find("li").removeClass("selected");
+            $item.addClass("selected");
+            
+            // update the title attr and the display markup
+            $display.find(".text").attr("title", $item.find(".text").html());
+            $display.find(".text").html(o.displayFormat.call($orig.find("option:selected")[0]));
+            
+            // trigger change on the old <select> if necessary
+            if(oldVal !== newVal) {
+                $orig.change();
+            }
+        };
+        
+        // when the user explicitly clicks an item
+        clickSBItem = function( e ) {
+            selectItem.call(this);
+            closeAndUnbind();
+            $display.focus();
+            return false;
+        };
+        
+        // start over for generating the search term
+        clearSearchTerm = function() {
+            searchTerm = "";
+        };
+        
+        // iterate over all the options to see if any match the search term
+        findMatchingItem = function( term ) {
+            var i, t, ts = "",
+                $available = getEnabled();
+            for(i=0; i < $available.size(); i++) {
+                t = $available.eq(i).find(".text").text();
+                ts += t + " ";
+                if(t.toLowerCase().match("^" + term.toLowerCase())) {
+                    return $available.eq(i);
+                }
+            }
+            return null;
+        };
+        
+        // if we get a match for any options, select it
+        selectMatchingItem = function( text ) {
+            var $matchingItem = findMatchingItem(text);
+            if($matchingItem !== null) {
+                selectItem.call($matchingItem[0]);
+                return true;
+            }
+            return false;
+        };
+        
+        // stop up/down/backspace/space from moving the page
+        stopPageHotkeys = function( e ) {
+            if(e.which === 38 || e.which === 40 || e.which === 8 || e.which === 32) {
+                e.preventDefault();
+            }
+        };
+        
+        // if a normal match fails, try matching the next element that starts with the pressed letter
+        selectNextItemStartsWith = function( c ) {
+            var i, t,
+                $selected = getSelected(),
+                $available = getEnabled();
+            for(i = $available.index($selected) + 1; i < $available.size(); i++) {
+                t = $available.eq(i).find(".text").text();
+                if(t !== "" && t.substring(0,1).toLowerCase() === c.toLowerCase()) {
+                    selectItem.call($available.eq(i)[0]);
+                    return true;
+                }
+            }
+            return false;
+        };
+        
+        // go up/down using arrows or attempt to autocomplete based on string
+        keydownSB = function( e ) {
+            if(e.altKey || e.ctrlKey) {
+                return false;
+            }
+            var $selected = getSelected();
+            switch(e.which) {
+            case 35: // end
+                if($selected.size() > 0) {
+                    e.preventDefault();
+                    selectItem.call(getEnabled().filter(":last")[0]);
+                    centerOnSelected();
+                }
+                break;
+            case 36: // home
+                if($selected.size() > 0) {
+                    e.preventDefault();
+                    selectItem.call(getEnabled().filter(":first")[0]);
+                    centerOnSelected();
+                }
+                break;
+            case 38: // up
+                if($selected.size() > 0) {
+                    if(getEnabled().filter(":first")[0] !== $selected[0]) {
+                        e.preventDefault();
+                        selectItem.call(getEnabled().eq(getEnabled().index($selected)-1)[0]);
+                    }
+                    centerOnSelected();
+                }
+                break;
+            case 40: // down
+                if($selected.size() > 0) {
+                    if(getEnabled().filter(":last")[0] !== $selected[0]) {
+                        e.preventDefault();
+                        selectItem.call(getEnabled().eq(getEnabled().index($selected)+1)[0]);
+                        centerOnSelected();
+                    }
+                } else if($items.size() > 1) {
+                    e.preventDefault();
+                    selectItem.call($items.eq(0)[0]);
+                }
+                break;
+            default:
+                break;
+            }
+        };
+        
+        // the user is typing -- try to select an item based on what they press
+        keyupSB = function( e ) {
+            if(e.altKey || e.ctrlKey) {
+              return false;
+            }
+            if(e.which !== 38 && e.which !== 40) {
+                
+                // add to the search term
+                searchTerm += String.fromCharCode(e.keyCode);
+                
+                if(selectMatchingItem(searchTerm)) {
+                
+                    // we found a match, continue with the current search term
+                    clearTimeout(cstTimeout);
+                    cstTimeout = setTimeout(clearSearchTerm, o.acTimeout);
+                    
+                } else if(selectNextItemStartsWith(String.fromCharCode(e.keyCode))) {
+                    
+                    // we selected the next item that starts with what you just pressed
+                    centerOnSelected();
+                    clearTimeout(cstTimeout);
+                    cstTimeout = setTimeout(clearSearchTerm, o.acTimeout);
+                    
+                } else {
+                    
+                    // no matches were found, clear everything
+                    clearSearchTerm();
+                    clearTimeout(cstTimeout);
+                    
+                }
+            }
+        };
+        
+        // when the sb is focused (by tab or click), allow hotkey selection and kill all other selectboxes
+        focusSB = function() {
+            closeAllButMe();
+            $sb.addClass("focused");
+            $(document)
+                .unbind("keyup", keyupSB)
+                .keyup(keyupSB)
+                .unbind("keydown", stopPageHotkeys)
+                .keydown(stopPageHotkeys)
+                .keydown(keydownSB)
+                .unbind("keydown", keydownSB)
+                .keydown(keydownSB);
+        };
+        
+        // when the sb is blurred (by tab or click), disable hotkey selection
+        blurSB = function() {
+            $sb.removeClass("focused");
+            $(document)
+                .unbind("keyup", keyupSB)
+                .unbind("keydown", stopPageHotkeys)
+                .unbind("keydown", keydownSB);
+        };
+        
+        // add hover class to an element
+        addHoverState = function() {
+          $(this).addClass("hover");
+        };
+        
+        // remove hover class from an element
+        removeHoverState = function() {
+          $(this).removeClass("hover");
+        };
+        
+        // constructor
+        this.init = function( opts ) {
 
-})(jQuery);
+            // this plugin is not compatible with IE6 and below;
+            // a normal <select> will be displayed for old browsers
+            if($.browser.msie && $.browser.version < 7) {
+              return;
+            }
+        
+            // don't create duplicate SBs
+            $orig = $(this.elem);
+            if($orig.hasClass("has_sb")) {
+                return;
+            } else {
+                $orig.addClass("has_sb");
+            }
+            
+            // set the various options
+            o = $.extend({
+                acTimeout: 800,               // time between each keyup for the user to create a search string
+                animDuration: 200,            // time to open/close dropdown in ms
+                ddCtx: 'body',                // body | self | any selector | a function that returns a selector (the original select is the context)
+                dropupThreshold: 150,         // the minimum amount of extra space required above the selectbox for it to display a dropup
+                fixedWidth: false,            // if false, dropdown expands to widest and display conforms to whatever is selected
+                maxHeight: false,             // if an integer, show scrollbars if the dropdown is too tall
+                maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
+                selectboxClass: 'selectbox',  // class to apply our markup
+                useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
+                
+                // markup appended to the display, typically for styling an arrow
+                arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'></span></span></span>",
+                
+                // given the selected element of the form <span class='text'>...</span> modify to fit the display as necessary
+                displayFormat: function() {
+                    if($(this).size() > 0) {
+                        var label = $(this).attr("label");
+                        if(label !== "") {
+                          return label;
+                        }
+                        return $(this).text();
+                    } else {
+                        return "";
+                    }
+                },
+                
+                // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
+                optionFormat: function( ogIndex, optIndex ) {
+                    var label = $(this).attr("label");
+                    if(label !== "") {
+                      return label;
+                    }
+                    return $(this).text();
+                },
+                
+                // the function to produce optgroup markup
+                optgroupFormat: function( ogIndex ) {
+                    return "<span class='label'>" + $(this).attr("label") + "</span>";
+                }
+            }, opts);
+            
+            // generate the new sb
+            loadSB();
+        };
+        
+        // public method interface
+        this.open = openSB;
+        this.close = closeSB;
+        this.refresh = reloadSB;
+        this.destroy = destroySB;
+        this.options = function( opts ) {
+            o = $.extend(o, opts);
+            reloadSB();
+        };
+    };
+
+    $.proto("sb", SelectBox);
+
+}(jQuery));
