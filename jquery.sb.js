@@ -38,9 +38,12 @@
         $(this).triggerHandler(event, params);
       });
     };
+    var aps = Array.prototype.slice,
+        randInt = function() {
+            return Math.floor(Math.random() * 999999999);
+        };
     
     // jQuery-Proto
-    var aps = Array.prototype.slice;
     $.proto = function() {
         var name = arguments[0],    // The name of the jQuery function that will be called
             clazz = arguments[1],   // A reference to the class that you are associating
@@ -148,6 +151,7 @@
         var self = this,
             o = {},
             $orig = null,
+            $label = null,
             $sb = null,
             $display = null,
             $dd = null,
@@ -190,37 +194,47 @@
             stopPageHotkeys;
         
         loadSB = function() {
-            var displayMarkup;
             
             // create the new sb
-            $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "'></div>");
+            $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "' id='sb" + randInt() + "'></div>")
+                .attr("role", "listbox")
+                .attr("aria-has-popup", "true")
+                .attr("aria-labelledby", $label.attr("id"));
+                
             $("body").append($sb);
             
             // generate the display markup
-            displayMarkup = $orig.children().size() > 0
+            var displayMarkup = $orig.children().size() > 0
                 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0)
                 : "&nbsp;";
-            $display = $("<a href='#' class='display " + $orig.attr("class") + "'></a>")
+            $display = $("<a href='#' class='display " + $orig.attr("class") + "' id='sbd" + randInt() + "'></a>")
                 .append("<div class='text'>" + displayMarkup + "</div>")
                 .append(o.arrowMarkup);
             $sb.append($display);
             
             // generate the dropdown markup
-            $dd = $("<ul class='" + o.selectboxClass + " items " + $orig.attr("class") + "'></ul>");
-            $sb.append($dd);
+            $dd = $("<ul class='" + o.selectboxClass + " items " + $orig.attr("class") + "' role='menu' id='sbdd" + randInt() + "'></ul>")
+                .attr("aria-hidden", "true");
+            $sb.append($dd)
+                .attr("aria-owns", $dd.attr("id"));
             if($orig.children().size() === 0) {
                 $dd.append(createOption());
             } else {
                 $orig.children().each(function( i ) {
-                    var $og, $ogItem, $ogList;
+                    var $opt, $og, $ogItem, $ogList;
                     if($(this).is("optgroup")) {
                         $og = $(this);
-                        $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>");
+                        $ogItem = $("<li class='optgroup'>" + o.optgroupFormat.call($og[0], i+1) + "</li>")
+                            .addClass($og.is(":disabled") ? "disabled" : "")
+                            .attr("aria-disabled", $og.is(":disabled") ? "true" : "");
                         $ogList = $("<ul class='items'></ul>");
                         $ogItem.append($ogList);
                         $dd.append($ogItem);
                         $og.children("option").each(function() {
-                            $ogList.append(createOption($(this), i));
+                            $opt = createOption($(this), i)
+                                .addClass($og.is(":disabled") ? "disabled" : "")
+                                .attr("aria-disabled", $og.is(":disabled") ? "true" : "");
+                            $ogList.append($opt);
                         });
                     } else {
                         $dd.append(createOption($(this), i));
@@ -231,7 +245,8 @@
             // cache all sb items
             $items = $dd.find("li").not(".optgroup");
             
-            // for styling
+            // for accessibility/styling
+            $sb.attr("aria-active-descendant", $items.filter(".selected").attr("id"));
             $dd.children(":first").addClass("first");
             $dd.children(":last").addClass("last");
             
@@ -259,7 +274,9 @@
             
             // bind events
             if(!$orig.is(":disabled")) {
-                $orig.focus(focusOrig);
+                $label
+                    .bind("click.sb", focusOrig)
+                    .bind("focus.sb", focusOrig);
                 $display
                     .mousedown(clickSB)
                     .click(falseFunc)
@@ -275,7 +292,7 @@
                 $items.filter(".disabled")
                     .click(falseFunc);
             } else {
-                $sb.addClass("disabled");
+                $sb.addClass("disabled").attr("aria-disabled");
                 $display.click(function( e ) { e.preventDefault(); });
             }
             
@@ -294,10 +311,12 @@
                 $option = $("<option value=''>&nbsp;</option>");
                 index = 0;
             }
-            var $li = $("<li></li>")
+            var $li = $("<li id='sbo" + randInt() + "'></li>")
+                    .attr("role", "option")
                     .data("value", $option ? $option.attr("value") : "")
                     .addClass($option.is(":selected") ? "selected" : "")
-                    .addClass($option.is(":disabled") ? "disabled" : ""),
+                    .addClass($option.is(":disabled") ? "disabled" : "")
+                    .attr("aria-disabled", $option.is(":disabled") ? "true" : ""),
                 $inner = $("<div class='item'></div>"),
                 $text = $("<div class='text'></div>")
                     .html(o.optionFormat.call($option[0], 0, index + 1));
@@ -312,11 +331,13 @@
         // unbind and remove
         destroySB = function() {
             $sb.remove();
-            $orig.unbind("reload.sb", reloadSB)
-                .unbind("domupdate.sb", delayReloadSB)
-                .unbind("focus.sb", focusOrig)
+            $orig.unbind(".sb", reloadSB)
+                .unbind(".sb", delayReloadSB)
                 .removeClass("has_sb")
                 .show();
+            $label
+                .unbind(".sb", focusOrig)
+                .unbind(".sb", focusOrig);
             $orig.removeData(self.id);
         };
         
@@ -371,6 +392,7 @@
                     .unbind("keyup", keyupSB)
                     .unbind("keydown", stopPageHotkeys)
                     .unbind("keydown", keydownSB);
+                $dd.attr("aria-hidden", "true");
                 if(instantClose === true) {
                   $dd.hide();
                   $sb.removeClass("open");
@@ -423,6 +445,7 @@
             if($.browser.msie && $.browser.version < 8) {
                 $("." + o.selectboxClass + " .display").hide().show(); // fix ie7 display bug
             }
+            $dd.attr("aria-hidden", "false")
             if(instantOpen === true) {
                 $dd.show();
                 centerOnSelected();
@@ -526,8 +549,9 @@
             $orig.val(newVal);
             
             // change the selection to this item
-            $dd.find("li").removeClass("selected");
+            getEnabled().removeClass("selected");
             $item.addClass("selected");
+            $sb.attr("aria-active-descendant", $item.attr("id"));
             
             // update the title attr and the display markup
             $display.find(".text").attr("title", $item.find(".text").html());
@@ -720,8 +744,16 @@
               return;
             }
         
-            // don't create duplicate SBs
+            // get the original <select> and <label>
             $orig = $(this.elem);
+            if($orig.attr("id")) {
+                $label = $("label[for='" + $orig.attr("id") + "']:first");
+            }
+            if(!$label || $label.size() == 0) {
+                $label = $orig.closest("label");
+            }
+            
+            // don't create duplicate SBs
             if($orig.hasClass("has_sb")) {
                 return;
             } else {
@@ -741,7 +773,7 @@
                 useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
                 
                 // markup appended to the display, typically for styling an arrow
-                arrowMarkup: "<span class='arrow_btn'><span class='interior'><span class='arrow'></span></span></span>",
+                arrowMarkup: "<div class='arrow_btn'><span class='interior'><span class='arrow'></span></span></div>",
                 
                 // given the selected element of the form <span class='text'>...</span> modify to fit the display as necessary
                 displayFormat: function() {

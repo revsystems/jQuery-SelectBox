@@ -5,6 +5,11 @@
   <meta http-equiv="content-type"  content="text/html;charset=UTF-8" />
   <title>Selectbox Replacment Demo</title>
   <link rel="stylesheet" href="jquery.sb.css" type="text/css" media="all" />
+  <style type="text/css">
+    body{margin:0 auto;}
+    .outer_container{text-align:center;}
+    .inner_container{margin:0 auto;text-align:left;width:960px;}
+  </style>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
   <script type="text/javascript" src="lib/jquerytie/jquery.tie.js"></script>
   <script type="text/javascript" src="jquery.sb.js"></script>
@@ -41,11 +46,6 @@
       });
     });
   </script>
-  <style type="text/css">
-    body{margin:0 auto;}
-    .outer_container{text-align:center;}
-    .inner_container{margin:0 auto;text-align:left;width:960px;}
-  </style>
 </head>
 <body>
   
@@ -109,10 +109,12 @@
               <option>Long dropdown test</option>
               <option>Long dropdown test</option>
               <option>Long dropdown test</option>
-              <option>Long dropdown test</option>
-              <option>Long dropdown test</option>
-              <option>Long dropdown test</option>
-              <option>Long dropdown test</option>
+              <optgroup label="Disabled optgroup" disabled="disabled">
+                  <option>Long dropdown test</option>
+                  <option>Long dropdown test</option>
+                  <option>Long dropdown test</option>
+                  <option>Long dropdown test</option>
+              </optgroup>
               <option>Long dropdown test</option>
               <option>Long dropdown test</option>
               <option>Long dropdown test</option>
@@ -144,15 +146,18 @@
             <option>Test 3</option>
             <option>Test 4</option>
             <option disabled="disabled">Test 5</option>
-          </select>
-          <select name="example4" class="round_sb">
-            <option>CT</option>
-            <option>DE</option>
-            <option>MA</option>
-            <option selected="selected">NJ</option>
-            <option>NY</option>
-            <option>PA</option>
-          </select>
+          </select><br/>
+          <label>State:
+            <select name="example4" class="round_sb">
+              <option>CT</option>
+              <option>DE</option>
+              <option>MA</option>
+              <option selected="selected">NJ</option>
+              <option>NY</option>
+              <option>PA</option>
+            </select>
+          </label><br/>
+          <label for="os0">Gift Certificate:</label>
           <select name="os0" id="os0" class="round_sb">
             <option value="Gift certificate 1 $50.00">Gift certificate 1 $50.00</option>
 
