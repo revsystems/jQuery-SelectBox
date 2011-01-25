@@ -88,12 +88,12 @@ To apply with options set:
       });
     });
 
-If you've used javascript to modify the contents of the original select, and you want the changes to appear in the replacement, triggering "reload" should match them:
+If you've used javascript to modify the contents of the original select, and you want the changes to appear in the replacement, calling "refresh" should match them:
 
     $(document).ready(function() {
       $("select").sb();
       $("select").append("<option>Hey! I'm new!</option>");
-      $("select").triggerHandler("reload");
+      $("select").sb("refresh");
     });
     
 Alternatively, if you don't have control over the function that triggers the reload--for example, if you're using an AJAX framework--you can use 
