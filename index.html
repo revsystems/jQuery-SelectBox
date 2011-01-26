@@ -44,6 +44,12 @@
       $("[name=example8], [name=example9]").sb({
         fixedWidth: true
       });
+      
+      $("[name=custom_markup_example]").sb({
+        optionFormat: function() {
+            return $(this).attr("alt");
+        }
+      });
     });
   </script>
 </head>
@@ -198,6 +204,12 @@
           <br/>
           <br/>
           <br/>
+          <label>Custom Markup Example
+              <select name="custom_markup_example">
+                <option alt="<div><span style='background:red;display:inline-block;*display:inline;height:10px;width:10px;vertical-align:middle;zoom:1;'></span> line 1</div><div>line 2</div><div>line 3</div>">a</option>
+                <option alt="<div>another option</div>">b</option>
+              </select>
+          </label>
           <br/>
           <br/>
           <br/>
