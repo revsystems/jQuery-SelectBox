@@ -583,10 +583,11 @@
         
         // iterate over all the options to see if any match the search term
         findMatchingItem = function( term ) {
-            var i, t,
+            var i, t, $tNode,
                 $available = getEnabled();
             for(i=0; i < $available.size(); i++) {
-                t = $available.eq(i).find(".text").text();
+                $tNode = $available.eq(i).find(".text");
+                t = $tNode.children().size() == 0 ? $tNode.text() : $tNode.find("*").text();
                 if(term.length > 0 && t.toLowerCase().match("^" + term.toLowerCase())) {
                     return $available.eq(i);
                 }
