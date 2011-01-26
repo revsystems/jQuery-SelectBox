@@ -179,6 +179,8 @@
             blurSB,
             addHoverState,
             removeHoverState,
+            addActiveState,
+            removeActiveState,
             getDDCtx,
             getSelected,
             getEnabled,
@@ -191,7 +193,8 @@
             closeAllButMe,
             closeAndUnbind,
             blurAllButMe,
-            stopPageHotkeys;
+            stopPageHotkeys,
+            flickerDisplay;
         
         loadSB = function() {
             
@@ -206,8 +209,8 @@
             var displayMarkup = $orig.children().size() > 0
                 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0)
                 : "&nbsp;";
-            $display = $("<a href='#' tabindex='-1' class='display " + $orig.attr("class") + "' id='sbd" + randInt() + "'></a>")
-                .append("<span class='text'>" + displayMarkup + "</span>")
+            $display = $("<div class='display " + $orig.attr("class") + "' id='sbd" + randInt() + "'></div>")
+                .append("<div class='text'>" + displayMarkup + "</div>")
                 .append(o.arrowMarkup);
             $sb.append($display);
             
@@ -251,19 +254,18 @@
             
             // modify width based on fixedWidth/maxWidth options
             if(!o.fixedWidth) {
-                var largestWidth = $sb.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
+                var largestWidth = $dd.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
                 $sb.width(o.maxWidth ? Math.min(o.maxWidth, largestWidth) : largestWidth);
-                if($.browser.msie && $.browser.version <= 7) {
-                    $items.find("a").each(function() {
-                        $(this).css("width", "100%").width($(this).width() - $(this).paddingWidth() - $(this).borderWidth());
-                    });
-                }
             } else if(o.maxWidth && $sb.width() > o.maxWidth) {
                 $sb.width(o.maxWidth);
             }
             
             // place the new markup in its semantic location
             $orig.before($sb).addClass("has_sb");
+            
+            // these two lines fix a div/span display bug on load in ie7
+            positionSB();
+            flickerDisplay();
             
             // hide the dropdown now that it's initialized
             $dd.hide();
@@ -274,6 +276,7 @@
                     .bind("blur.sb", blurOrig)
                     .bind("focus.sb", focusOrig);
                 $display
+                    .mousedown(addActiveState)
                     .mousedown(clickSB)
                     .click(falseFunc)
                     .focus(focusSB)
@@ -334,12 +337,10 @@
         // unbind and remove
         destroySB = function() {
             $sb.remove();
-            $orig.unbind(".sb", reloadSB)
-                .unbind(".sb", delayReloadSB)
-                .removeClass("has_sb");
             $orig
                 .unbind(".sb")
-            $orig.removeData(self.id);
+                .removeClass("has_sb")
+                .removeData(self.id);
         };
         
         // destroy then load, maintaining open/focused state if applicable
@@ -436,6 +437,12 @@
             $dd.scrollTop($dd.scrollTop() + getSelected().offsetFrom($dd).top - $dd.height() / 2 + getSelected().outerHeight(true) / 2);
         };
         
+        flickerDisplay = function() {
+            if($.browser.msie && $.browser.version < 8) {
+                $("." + o.selectboxClass + " .display").hide().show(); // fix ie7 display bug
+            }
+        };
+        
         // show, reposition, and reset dropdown markup
         openSB = function( instantOpen ) {
             var dir,
@@ -444,9 +451,6 @@
             $sb.addClass("open");
             $ddCtx.append($dd);
             dir = positionSB();
-            if($.browser.msie && $.browser.version < 8) {
-                $("." + o.selectboxClass + " .display").hide().show(); // fix ie7 display bug
-            }
             $dd.attr("aria-hidden", "false");
             if(instantOpen === true) {
                 $dd.show();
@@ -739,6 +743,18 @@
         // remove hover class from an element
         removeHoverState = function() {
           $(this).removeClass("hover");
+        };
+        
+        // add active class to the display
+        addActiveState = function() {
+          $display.addClass("active");
+          $(document).bind("mouseup", removeActiveState);
+        };
+        
+        // remove active class from an element
+        removeActiveState = function() {
+          $display.removeClass("active");
+          $(document).unbind("mouseup", removeActiveState);
         };
         
         // constructor
