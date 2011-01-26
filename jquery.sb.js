@@ -260,8 +260,8 @@
                 $sb.width(o.maxWidth);
             }
             
-            // place the new markup in its semantic location
-            $orig.before($sb).addClass("has_sb");
+            // place the new markup in its semantic location (hide/show fixes positioning bugs)
+            $orig.before($sb).addClass("has_sb").hide().show();
             
             // these two lines fix a div/span display bug on load in ie7
             positionSB();
@@ -351,10 +351,10 @@
             destroySB();
             self.init(o);
             if(isOpen) {
-                $display.focus();
+                $orig.focus();
                 openSB(true);
             } else if(isFocused) {
-                $display.focus();
+                $orig.focus();
             }
         };
         
@@ -461,7 +461,7 @@
                 $dd.fadeIn(o.animDuration, centerOnSelected);
             }
             $(document).click(closeAndUnbind);
-            $display.focus();
+            $orig.focus();
         };
         
         // position dropdown based on collision detection
@@ -572,7 +572,7 @@
         clickSBItem = function( e ) {
             selectItem.call(this);
             closeAndUnbind();
-            $display.focus();
+            $orig.focus();
             return false;
         };
         
@@ -796,8 +796,11 @@
                 // markup appended to the display, typically for styling an arrow
                 arrowMarkup: "<div class='arrow_btn'><span class='arrow'></span></div>",
                 
-                // given the selected element of the form <span class='text'>...</span> modify to fit the display as necessary
-                displayFormat: function() {
+                // use optionFormat by default
+                displayFormat: undefined,
+                
+                // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
+                optionFormat: function( ogIndex, optIndex ) {
                     if($(this).size() > 0) {
                         var label = $(this).attr("label");
                         if(label && label.length > 0) {
@@ -809,20 +812,12 @@
                     }
                 },
                 
-                // formatting for the display; note that it will be wrapped with <a href='#'><span class='text'></span></a>
-                optionFormat: function( ogIndex, optIndex ) {
-                    var label = $(this).attr("label");
-                    if(label !== "") {
-                      return label;
-                    }
-                    return $(this).text();
-                },
-                
                 // the function to produce optgroup markup
                 optgroupFormat: function( ogIndex ) {
                     return "<span class='label'>" + $(this).attr("label") + "</span>";
                 }
             }, opts);
+            o.displayFormat = o.displayFormat || o.optionFormat;
             
             // generate the new sb
             loadSB();
