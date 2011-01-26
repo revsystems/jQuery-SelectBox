@@ -38,6 +38,63 @@
         $(this).triggerHandler(event, params);
       });
     };
+    
+    $.fn.margin = function( side ) {
+        var $e = $(this).eq(0);
+        
+        // different methods for each browser type
+        function shiftDiff( s ) {
+            var x, 
+                res, 
+                cs = "margin" + s.substring(0,1).toUpperCase() + s.substring(1);
+            if($e[0].currentStyle !== undefined) {
+                // if we get auto back, do the offset diff trick
+                res = $e[0].currentStyle[cs];
+                if(res === "auto") {
+                    x = $e.offset()[s];
+                    $e[0].style[cs] = 0;
+                    res = x - $e.offset()[s];
+                    $e[0].style[cs] = "auto";
+                }
+                return parseFloat(res);
+            } else if($.browser.mozilla) {
+                if(s.match(/left|right/i) && $e.css("margin-" + s) === "0px") {
+                    // 0 could be 0 or auto. to find out, set it to 0 manually then do the offset diff trick
+                    // if it should be auto, make sure you set it back to that
+                    x = $e.offset()[s];
+                    if($().jquery >= "1.4.2") {
+                        var $mark = $("<div></div>");
+                        $e.append($mark);
+                        x = $mark.offset()[s];
+                        $mark.remove();
+                    }
+                    $e.css("margin-" + s, 0);
+                    res = x - $e.offset()[s];
+                    if($e.offset()[s] !== x) { $e.css("margin-" + s, "auto"); }
+                    return res;
+                } else {
+                    return parseFloat($e.css("margin-" + s));
+                }
+            } else if(window.getComputedStyle) {
+                // webkit, just use getComputedStyle, it works
+                return parseFloat(getComputedStyle($e[0], "")["margin-" + side]);
+            } else {
+                // unknown
+                return parseFloat($e.css("margin-" + s));
+            }
+        }
+        
+        // if auto is working (centered), then left/right 
+        // and top/bottom should return the same value
+        if(side === "left" || side === "right") { return shiftDiff("left"); }
+        if(side === "top" || side === "bottom") { return shiftDiff("top"); }
+        
+        // there are other tricks, but this takes auto into account
+        if(side === "width") { return $e.margin("left") + $e.margin("right"); }
+        if(side === "height") { return $e.margin("top") + $e.margin("bottom"); }
+        return undefined;
+    };
+    
     var aps = Array.prototype.slice,
         randInt = function() {
             return Math.floor(Math.random() * 999999999);
@@ -70,7 +127,7 @@
                     obj = $e.data(name);
                 
                 // if the object is not defined for this element
-                if(obj === undefined) {
+                if(!obj) {
                     
                     // create the new object and restore init if necessary
                     obj = new klazz();
@@ -307,7 +364,7 @@
         // create new markup from an <option>
         createOption = function( $option, index ) {
             if(!$option) { 
-                $option = $("<option value=''>&nbsp;</option>");
+                $option = $("<option value='' selected='selected'>&nbsp;</option>");
                 index = 0;
             }
             var $li = $("<li id='sbo" + randInt() + "'></li>")
@@ -513,18 +570,21 @@
                 dir = "down";
             }
             
-            // modify dropdown css for display
-            bodyX = $().jquery < "1.4.2"
-                ? $("body").offset().left
-                : parseInt($("body").css("margin-left"), 10);
-            bodyY = $().jquery < "1.4.2"
-                ? $("body").offset().top
-                : parseInt($("body").css("margin-top"), 10);
+            bodyX = $().jquery >= "1.4.2" && $.browser.msie
+                ? $("body").margin("left")
+                : -$("body").offset().left;
+            bodyY = $().jquery >= "1.4.2" && $.browser.msie
+                ? $("body").margin("top")
+                : -$("body").offset().top;
+            if($.browser.msie && $.browser.version < 8 && $().jquery >= "1.4.2") {
+                bodyX *= -1;
+                bodyY *= -1;
+            }
             $dd.hide().css({
-                left: ddX + ($ddCtx[0].tagName.toLowerCase() === "body" ? bodyX : 0),
+                left: ddX - ($ddCtx.is("body") ? bodyX : 0),
                 maxHeight: ddMaxHeight,
                 position: "absolute",
-                top: ddY + ($ddCtx[0].tagName.toLowerCase() === "body" ? bodyY : 0),
+                top: ddY - ($ddCtx.is("body") ? bodyY : 0),
                 visibility: "visible"
             });
             if(dir === "up") {
