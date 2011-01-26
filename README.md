@@ -18,19 +18,22 @@
 
 ## Features
 
+  * Recreates and extends all functionality of the browser's built-in `<select>` element
   * Fully stylable and flexible with standard, valid markup
+  * Compliant with ARIA guidelines and best practices
   * Original select is updated behind-the-scenes
-  * Change event handlers on original select still work
-  * Allows up/down hotkeys on focus
-  * Allows automatic matching of typed strings on focus
+  * Change event handlers on original `<select>` still work
+  * Keyboard Accessible: Manages tab focus, supports up/down/home/end hotkeys and automatic matching of typed strings
   * Javascript animations on close/open
   * Intelligent collision avoidance (the selectbox tries to fit on the screen)
   * Deals effectively with cross-browser z-index issues
   * Handles optgroups
   * Handles disabled selects
+  * Handles disabled optgroups
   * Handles disabled options
-  * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original select
-  * Can be set to reload automatically, using [jquery.tie](https://github.com/revsystems/jQuery-Tie), when the underlying select changes
+  * Can be refreshed arbitrarily, i.e. when you dynamically add/remove options from the original select
+  * Options for a specific `<select>` can be changed on the fly
+  * Can be set to refresh automatically, using [jquery.tie](https://github.com/revsystems/jQuery-Tie), when the underlying `<select>` changes
   * Allows custom markup formatting for visible elements
 
   The css in this plugin also includes an example custom style called "round_sb".
