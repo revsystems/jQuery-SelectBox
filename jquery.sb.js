@@ -48,13 +48,12 @@
         var name = arguments[0],    // The name of the jQuery function that will be called
             clazz = arguments[1],   // A reference to the class that you are associating
             klazz = clazz,          // A version of clazz with a delayed constructor
-            extOpt = {};            // used to extend clazz with a variable name for the init function
-        
-        opts = $.extend({
-            elem: "elem",
-            access: "access",
-            init: "init"
-        }, arguments[2]);
+            extOpt = {},            // used to extend clazz with a variable name for the init function
+            opts = $.extend({
+                elem: "elem",
+                access: "access",
+                init: "init"
+            }, arguments[2]);
         
         if(clazz._super) {
             extOpt[opts.init] = function(){};
@@ -199,7 +198,7 @@
             $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "' id='sb" + randInt() + "'></div>")
                 .attr("role", "listbox")
                 .attr("aria-has-popup", "true")
-                .attr("aria-labelledby", $label.attr("id") != null ? $label.attr("id") : "");
+                .attr("aria-labelledby", $label.attr("id") ? $label.attr("id") : "");
                 
             $("body").append($sb);
             
@@ -208,7 +207,7 @@
                 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0)
                 : "&nbsp;";
             $display = $("<a href='#' class='display " + $orig.attr("class") + "' id='sbd" + randInt() + "'></a>")
-                .append("<div class='text'>" + displayMarkup + "</div>")
+                .append("<span class='text'>" + displayMarkup + "</span>")
                 .append(o.arrowMarkup);
             $sb.append($display);
             
@@ -313,6 +312,7 @@
             }
             var $li = $("<li id='sbo" + randInt() + "'></li>")
                     .attr("role", "option")
+                    .data("orig", $option[0])
                     .data("value", $option ? $option.attr("value") : "")
                     .addClass($option.is(":selected") ? "selected" : "")
                     .addClass($option.is(":disabled") ? "disabled" : "")
@@ -323,9 +323,14 @@
             return $li.append($inner.append($text));
         };
         
-        // theoretically causes focus if the label is clicked -- untested
+        // causes focus if the label is clicked
         focusOrig = function() {
-          $display.focus();
+            blurAllButMe();
+            if($sb.closest("label")[0] !== $label[0]) {
+                $display.focus();
+            } else {
+                $display.triggerHandler("focus");
+            }
         };
         
         // unbind and remove
@@ -391,6 +396,7 @@
                 $(document)
                     .unbind("keyup", keyupSB)
                     .unbind("keydown", stopPageHotkeys)
+                    .unbind("keypress", stopPageHotkeys)
                     .unbind("keydown", keydownSB);
                 $dd.attr("aria-hidden", "true");
                 if(instantClose === true) {
@@ -445,7 +451,7 @@
             if($.browser.msie && $.browser.version < 8) {
                 $("." + o.selectboxClass + " .display").hide().show(); // fix ie7 display bug
             }
-            $dd.attr("aria-hidden", "false")
+            $dd.attr("aria-hidden", "false");
             if(instantOpen === true) {
                 $dd.show();
                 centerOnSelected();
@@ -474,7 +480,7 @@
             $dd.show().css({
                 maxHeight: "none",
                 position: "relative",
-                /* visibility: "hidden" */
+                visibility: "hidden"
             });
             if(!o.fixedWidth) {
               $dd.width($display.outerWidth() - $dd.extraWidth() + 1);
@@ -544,7 +550,8 @@
                 newVal = $item.data("value");
             
             // update the original <select>
-            $orig.val(newVal);
+            $orig.find("option").removeAttr("selected");
+            $($item.data("orig")).attr("selected", "selected");
             
             // change the selection to this item
             getEnabled().removeClass("selected");
@@ -553,7 +560,7 @@
             
             // update the title attr and the display markup
             $display.find(".text").attr("title", $item.find(".text").html());
-            $display.find(".text").html(o.displayFormat.call($orig.find("option:selected")[0]));
+            $display.find(".text").html(o.displayFormat.call($item.data("orig")));
             
             // trigger change on the old <select> if necessary
             if(oldVal !== newVal) {
@@ -600,6 +607,9 @@
         
         // stop up/down/backspace/space from moving the page
         stopPageHotkeys = function( e ) {
+            if(e.ctrlKey || e.altKey) {
+                return;
+            }
             if(e.which === 38 || e.which === 40 || e.which === 8 || e.which === 32) {
                 e.preventDefault();
             }
@@ -625,36 +635,37 @@
             if(e.altKey || e.ctrlKey) {
                 return false;
             }
-            var $selected = getSelected();
+            var $selected = getSelected(),
+                $enabled = getEnabled();
             switch(e.which) {
             case 35: // end
                 if($selected.size() > 0) {
                     e.preventDefault();
-                    selectItem.call(getEnabled().filter(":last")[0]);
+                    selectItem.call($enabled.filter(":last")[0]);
                     centerOnSelected();
                 }
                 break;
             case 36: // home
                 if($selected.size() > 0) {
                     e.preventDefault();
-                    selectItem.call(getEnabled().filter(":first")[0]);
+                    selectItem.call($enabled.filter(":first")[0]);
                     centerOnSelected();
                 }
                 break;
             case 38: // up
                 if($selected.size() > 0) {
-                    if(getEnabled().filter(":first")[0] !== $selected[0]) {
+                    if($enabled.filter(":first")[0] !== $selected[0]) {
                         e.preventDefault();
-                        selectItem.call(getEnabled().eq(getEnabled().index($selected)-1)[0]);
+                        selectItem.call($enabled.eq($enabled.index($selected)-1)[0]);
                     }
                     centerOnSelected();
                 }
                 break;
             case 40: // down
                 if($selected.size() > 0) {
-                    if(getEnabled().filter(":last")[0] !== $selected[0]) {
+                    if($enabled.filter(":last")[0] !== $selected[0]) {
                         e.preventDefault();
-                        selectItem.call(getEnabled().eq(getEnabled().index($selected)+1)[0]);
+                        selectItem.call($enabled.eq($enabled.index($selected)+1)[0]);
                         centerOnSelected();
                     }
                 } else if($items.size() > 1) {
@@ -707,6 +718,8 @@
             $(document)
                 .unbind("keyup", keyupSB)
                 .keyup(keyupSB)
+                .unbind("keypress", stopPageHotkeys)
+                .keypress(stopPageHotkeys)
                 .unbind("keydown", stopPageHotkeys)
                 .keydown(stopPageHotkeys)
                 .keydown(keydownSB)
@@ -747,7 +760,7 @@
             if($orig.attr("id")) {
                 $label = $("label[for='" + $orig.attr("id") + "']:first");
             }
-            if(!$label || $label.size() == 0) {
+            if(!$label || $label.size() === 0) {
                 $label = $orig.closest("label");
             }
             
@@ -777,7 +790,7 @@
                 displayFormat: function() {
                     if($(this).size() > 0) {
                         var label = $(this).attr("label");
-                        if(label !== "") {
+                        if(label && label.length > 0) {
                           return label;
                         }
                         return $(this).text();

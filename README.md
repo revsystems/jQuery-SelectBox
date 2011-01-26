@@ -13,7 +13,7 @@
   
 ## TODO
 
-  * Apply ARIA markup
+  * Test ARIA markup
   * Create optional skins
 
 ## Features
