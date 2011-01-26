@@ -793,7 +793,7 @@
                 useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
                 
                 // markup appended to the display, typically for styling an arrow
-                arrowMarkup: "<div class='arrow_btn'><span class='interior'><span class='arrow'></span></span></div>",
+                arrowMarkup: "<div class='arrow_btn'><span class='arrow'></span></div>",
                 
                 // given the selected element of the form <span class='text'>...</span> modify to fit the display as necessary
                 displayFormat: function() {
