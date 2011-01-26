@@ -84,8 +84,7 @@ To apply with options set:
     $(document).ready(function() {
       $("select").sb({
         animDuration: 1000,
-        ddCtx: function() { return $(this).closest("form"); },
-        fixedWidth: false,
+        fixedWidth: true,
         etc...
       });
     });
@@ -105,6 +104,16 @@ Alternatively, if you don't have control over the function that triggers the rel
       $("select").sb({ useTie: true });
       $("select").append("<option>Hey! I'm new!</option>");
     });
+    
+Refreshing can be done at any time, even while the SelectBox is open.
+
+You can also change the options for a SelectBox on the fly:
+
+    // this initializes all <select>s
+    $("select").sb()
+    
+    // and this sets a specific set to use fixedWidth styling:
+    $("select.fixed_width").sb("options", { fixedWidth: true });
 
 ## Custom Styling
 
@@ -231,3 +240,13 @@ In your css, you can add the following to make a selectbox with visual width = 1
       
       If you need to center your page, you can do with without setting a margin on "body". Please check out 
       the jquery-sb demo page along with my use of outer_container and inner_container classes.
+
+## Bug Reports
+
+  Before you report a bug, I highly suggest making sure you have the most up-to-date version of 
+  jQuery-SelectBox. I update the code very frequently and may introduce/squash bugs in rapid succession. This 
+  will continue until an official release is announced, at which point a stable download will be created and a new 
+  development branch will be started.
+  
+  If you spot a bug that's lingering, please let me know on the
+  [https://github.com/revsystems/jQuery-SelectBox/issues](jQuery-SelectBox Github Issues page).
