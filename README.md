@@ -40,15 +40,18 @@
 
 ## Compatibility
 
-  jQuery-SelectBox has been tested in the following browsers:
+  jQuery-SelectBox has been tested and confirmed working in the following browsers:
   
   * Firefox 3.6.12
   * Google Chrome 7.0.517.44
-  * IE7 (via IE9 beta)
-  * IE8 (via IE9 beta)
+  * Opera 11.00 build 1156
   * IE9 beta
+  * IE8 (via IE9 beta)
+  * IE7 (via IE9 beta)
   
   It requires [jQuery version 1.3.x](http://jquery.com) and up.
+  
+  IE6 and below are ignored by jQuery-SelectBox.
 
 ## Usage
 
