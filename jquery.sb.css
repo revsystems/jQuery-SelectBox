@@ -1,3 +1,6 @@
+/* applied to original <select> to hide */
+.has_sb{position:absolute;left:-999999em;}
+
 /* always visible styles */
 .selectbox{display:inline-block;*display:inline;font-family:arial;font-size:13px;margin:1px;position:relative;vertical-align:middle;zoom:1;}
 .selectbox .display{

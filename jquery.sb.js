@@ -163,6 +163,7 @@
             loadSB,
             createOption,
             focusOrig,
+            blurOrig,
             destroySB,
             reloadSB,
             delayReloadSB,
@@ -199,14 +200,13 @@
                 .attr("role", "listbox")
                 .attr("aria-has-popup", "true")
                 .attr("aria-labelledby", $label.attr("id") ? $label.attr("id") : "");
-                
             $("body").append($sb);
             
             // generate the display markup
             var displayMarkup = $orig.children().size() > 0
                 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0)
                 : "&nbsp;";
-            $display = $("<a href='#' class='display " + $orig.attr("class") + "' id='sbd" + randInt() + "'></a>")
+            $display = $("<a href='#' tabindex='-1' class='display " + $orig.attr("class") + "' id='sbd" + randInt() + "'></a>")
                 .append("<span class='text'>" + displayMarkup + "</span>")
                 .append(o.arrowMarkup);
             $sb.append($display);
@@ -249,9 +249,6 @@
             $dd.children(":first").addClass("first");
             $dd.children(":last").addClass("last");
             
-            // hide the original
-            $orig.hide();
-            
             // modify width based on fixedWidth/maxWidth options
             if(!o.fixedWidth) {
                 var largestWidth = $sb.find(".text, .optgroup").maxWidth() + $display.extraWidth() + 1;
@@ -266,15 +263,15 @@
             }
             
             // place the new markup in its semantic location
-            $orig.before($sb);
+            $orig.before($sb).addClass("has_sb");
             
             // hide the dropdown now that it's initialized
             $dd.hide();
             
             // bind events
             if(!$orig.is(":disabled")) {
-                $label
-                    .bind("click.sb", focusOrig)
+                $orig
+                    .bind("blur.sb", blurOrig)
                     .bind("focus.sb", focusOrig);
                 $display
                     .mousedown(clickSB)
@@ -323,14 +320,15 @@
             return $li.append($inner.append($text));
         };
         
-        // causes focus if the label is clicked
+        // causes focus if original is focused
         focusOrig = function() {
             blurAllButMe();
-            if($sb.closest("label")[0] !== $label[0]) {
-                $display.focus();
-            } else {
-                $display.triggerHandler("focus");
-            }
+            $display.triggerHandler("focus");
+        };
+        
+        // loses focus if original is blurred
+        blurOrig = function() {
+            $display.triggerHandler("blur");
         };
         
         // unbind and remove
@@ -338,11 +336,9 @@
             $sb.remove();
             $orig.unbind(".sb", reloadSB)
                 .unbind(".sb", delayReloadSB)
-                .removeClass("has_sb")
-                .show();
-            $label
-                .unbind(".sb", focusOrig)
-                .unbind(".sb", focusOrig);
+                .removeClass("has_sb");
+            $orig
+                .unbind(".sb")
             $orig.removeData(self.id);
         };
         
@@ -583,12 +579,11 @@
         
         // iterate over all the options to see if any match the search term
         findMatchingItem = function( term ) {
-            var i, t, ts = "",
+            var i, t,
                 $available = getEnabled();
             for(i=0; i < $available.size(); i++) {
                 t = $available.eq(i).find(".text").text();
-                ts += t + " ";
-                if(t.toLowerCase().match("^" + term.toLowerCase())) {
+                if(term.length > 0 && t.toLowerCase().match("^" + term.toLowerCase())) {
                     return $available.eq(i);
                 }
             }
@@ -767,8 +762,6 @@
             // don't create duplicate SBs
             if($orig.hasClass("has_sb")) {
                 return;
-            } else {
-                $orig.addClass("has_sb");
             }
             
             // set the various options
