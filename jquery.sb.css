@@ -20,8 +20,8 @@
 }
 .selectbox.disabled .display{color:#999;}
 .selectbox.focused .display .text{background-color:#3399ff;color:#fcfcfc;display:inline-block;*display:inline;zoom:1;}
-.selectbox .display:active{border-color:#7b7d83;}
-.selectbox .display:active .arrow_btn{background-color:#9eb0ba;}
+.selectbox .display.active{border-color:#7b7d83;}
+.selectbox .display.active .arrow_btn{background-color:#9eb0ba;}
 .selectbox .display.hover .arrow_btn .interior{background-image:url(images/select_arrow_bg_hover.gif);}
 .selectbox .display .arrow_btn{background:#fcfcfc;border:1px solid #707070;display:block;height:15px;padding:1px;position:absolute;right:0;top:0;width:14px;}
 .selectbox .display .arrow_btn .interior{background:#dbdbdb url(images/select_arrow_bg.gif) repeat-x left center;display:block;height:15px;}
@@ -46,7 +46,7 @@
 }
 .selectbox.items.above{}
 .selectbox.items li{display:block;margin:0;padding:0;/*white-space:nowrap; maybe necessary if using fixedWidth: false */}
-.selectbox.items li:first-child{margin-top:0;}
+.selectbox.items li.first{margin-top:0;}
 .selectbox.items li>.item{color:#000;cursor:default;display:block;padding:4px 6px;text-decoration:none;}
 .selectbox.items li>.item>.text{display:inline-block;*display:inline;zoom:1;}
 .selectbox.items li.selected>.item{border-bottom:1px dotted #999;border-top:1px dotted #999;}
