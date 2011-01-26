@@ -1,5 +1,5 @@
 /* applied to original <select> to hide */
-.has_sb{position:absolute;left:-999999em;}
+.has_sb{position:absolute;left:-999999em;text-indent:-999999em;}
 
 /* always visible styles */
 .selectbox{display:inline-block;*display:inline;font-family:arial;font-size:1em;margin:1px;position:relative;vertical-align:middle;zoom:1;}
@@ -46,7 +46,7 @@
     -moz-box-shadow:inset 0 0 1px 1px #9eb0ba;
     -webkit-box-shadow:inset 0 0 1px 1px #9eb0ba;
 }
-.selectbox .display.hover .arrow_btn .interior{background-image:url(images/select_arrow_bg_hover.gif);}
+.selectbox .display.hover .arrow_btn{background-image:url(images/select_arrow_bg_hover.gif);}
 .selectbox .value{display:none;}
 
 /* dropdown styles */
