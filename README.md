@@ -211,7 +211,7 @@ In your css, you can add the following to make a selectbox with visual width = 1
       
 ## Troubleshooting
 
-**jQuery-SelectBox in div with z-index**
+###jQuery-SelectBox in div with z-index
   
 If you call $("select").sb() (no special options) on a select in a z-index'ed element, the dropdown 
 may appear UNDERNEATH the element.
@@ -223,7 +223,7 @@ css for .items to have a z-index greater than the parent div.
 For newer versions, I set the default z-index of .items to 99999, so you probably won't see this issue 
 unless you're using huge z-index values.
       
-**margin:auto on body**
+###margin:auto on body
       
 Across different browsers and jQuery versions, it is very difficult to get a stanard margin value for the 
 body when it is set to "auto".
@@ -256,7 +256,7 @@ In your HTML:
     
 If you use this pattern, you should have no issues with margin:auto on `body`.
 
-**I need to keep margin:auto on my body tag. How do I get jQuery-SelectBox to behave?**
+###I need to keep margin:auto on my body tag. How do I get jQuery-SelectBox to behave?
 
 If you're stuck with margin:auto on the `body` element, then I suggest specifying the ddCtx option.
 The ddCtx (dropdown context) option lets you change which element the dropdown is appended to, thereby 
@@ -284,7 +284,7 @@ The downside to this method is that, if z-index comes into play, the dropdown mi
 `#an_arbitrary_container`--due to the buggy z-index handling in IE7. Consider yourself warned. You can manipulate 
 the z-indexes in CSS so it works, but it's advanced.
   
-**IE7/IE8: Javascript error is thrown when clicking to open the selectbox**
+###IE7/IE8: Javascript error is thrown when clicking to open the selectbox
     
 See "margin:auto on body" above. If that is not the problem, please let me know on the
 [Issues Page](https://github.com/revsystems/jQuery-SelectBox/issues).
