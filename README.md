@@ -237,8 +237,14 @@ is too finicky. Instead, I often use the following pattern.
 In your css file:
 
     body{margin:0;}
-    .outer_container{text-align:center;} /* text-align centers the child div in old versions of IE */
-    .inner_container{margin:0 auto;text-align:left;width:960px} /* margin:auto centers in newer browsers and text-align:left resets the sub-elements */
+    .outer_container{
+      text-align:center; /* text-align centers the child div in old versions of IE */
+    } 
+    .inner_container{
+      margin:0 auto; /* margin:auto centers in newer browsers */
+      text-align:left; /* text-align:left resets the sub-elements */
+      width:960px; /* the width of your page */
+    } 
 
 In your HTML:
 
