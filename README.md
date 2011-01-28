@@ -281,7 +281,7 @@ And to specify ddCtx when you initialize jQuery-SelectBox:
     $("select").sb({ ddCtx: "#an_arbitrary_container" });
     
 The downside to this method is that, if z-index comes into play, the dropdown might appear BEHIND siblings of 
-#an_arbitrary_container--due to the buggy z-index handling in IE7. Consider yourself warned. You can manipulate 
+`#an_arbitrary_container`--due to the buggy z-index handling in IE7. Consider yourself warned. You can manipulate 
 the z-indexes in CSS so it works, but it's advanced.
   
 **IE7/IE8: Javascript error is thrown when clicking to open the selectbox**
