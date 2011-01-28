@@ -476,7 +476,8 @@
                 ddY = 0,
                 dir = "",
                 bottomSpace, topSpace,
-                bottomOffset, spaceDiff;
+                bottomOffset, spaceDiff,
+                bodyX, bodyY;
             
             // modify dropdown css for getting values
             $dd.removeClass("above");
@@ -516,12 +517,20 @@
                 dir = "down";
             }
             
+            bodyX = $().jquery >= "1.4.2"
+                ? parseInt($("body").css("margin-left"))
+                : $("body").offset().left;
+            bodyY = $().jquery >= "1.4.2"
+                ? parseInt(parseInt($("body").css("margin-left")))
+                : $("body").offset().top;
+            
+            
             // modify dropdown css for display
             $dd.hide().css({
-                left: ddX,
+                left: ddX + ($ddCtx.is("body") ? bodyX : 0),
                 maxHeight: ddMaxHeight,
                 position: "absolute",
-                top: ddY,
+                top: ddY + ($ddCtx.is("body") ? bodyY : 0),
                 visibility: "visible"
             });
             if(dir === "up") {
