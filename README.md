@@ -7,16 +7,16 @@
   
   Please feel free to rate this plugin on [plugins.jquery.com](http://plugins.jquery.com/project/jquery-sb).
 
-## Demo
+# Demo
 
   You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
   
-## TODO
+# TODO
 
   * Test ARIA markup
   * Create optional skins
 
-## Features
+# Features
 
   * Recreates and extends all functionality of the browser's built-in `<select>` element
   * Fully stylable and flexible with standard, valid markup
@@ -41,7 +41,7 @@
   and (b) to give you a familiar but slightly more modern version of the selectbox 
   that you can integrate with minimal or no css modification.
 
-## Compatibility
+# Compatibility
 
   jQuery-SelectBox has been tested and confirmed working in the following browsers:
   
@@ -56,7 +56,7 @@
   
   IE6 and below are ignored by jQuery-SelectBox.
 
-## Usage
+# Usage
 
 Requires [jQuery](http://jquery.com) and this plugin.
 
@@ -115,9 +115,9 @@ You can also change the options for a SelectBox on the fly:
     // and this sets a specific set to use fixedWidth styling:
     $("select.fixed_width").sb("options", { fixedWidth: true });
 
-## Custom Styling
+# Custom Styling
 
-### Making a fixed width selectbox
+## Making a fixed width selectbox
 
 Say you want to make your selectboxes a fixed width so they line up with the rest of your inputs. Try something like this.
 
@@ -137,7 +137,7 @@ In your css, you can add the following to make a selectbox with visual width = 1
       width:100px; /* width of display text plus the padding (73 + 27) = 100, so they line up */
     }
 
-## Options
+# Options
   
   View defaults and short descriptions for options in jquery.sb.js. This list is meant to be more 
   informative than the js comments.
@@ -209,9 +209,9 @@ In your css, you can add the following to make a selectbox with visual width = 1
       included on the page, this will automatically monitor changes in the underlying select and update 
       jquery-sb accordingly.
       
-## Troubleshooting
+# Troubleshooting
 
-### jQuery-SelectBox in div with z-index
+## jQuery-SelectBox in div with z-index
   
 If you call $("select").sb() (no special options) on a select in a z-index'ed element, the dropdown 
 may appear UNDERNEATH the element.
@@ -223,7 +223,7 @@ css for .items to have a z-index greater than the parent div.
 For newer versions, I set the default z-index of .items to 99999, so you probably won't see this issue 
 unless you're using huge z-index values.
       
-### margin:auto on body
+## margin:auto on body
       
 Across different browsers and jQuery versions, it is very difficult to get a stanard margin value for the 
 body when it is set to "auto".
@@ -256,7 +256,7 @@ In your HTML:
     
 If you use this pattern, you should have no issues with margin:auto on `body`.
 
-### I need to keep margin:auto on my body tag. How do I get jQuery-SelectBox to behave?
+## I need to keep margin:auto on my body tag. How do I get jQuery-SelectBox to behave?
 
 If you're stuck with margin:auto on the `body` element, then I suggest specifying the ddCtx option.
 The ddCtx (dropdown context) option lets you change which element the dropdown is appended to, thereby 
@@ -284,12 +284,12 @@ The downside to this method is that, if z-index comes into play, the dropdown mi
 `#an_arbitrary_container`--due to the buggy z-index handling in IE7. Consider yourself warned. You can manipulate 
 the z-indexes in CSS so it works, but it's advanced.
   
-###IE7/IE8: Javascript error is thrown when clicking to open the selectbox
+## IE7/IE8: Javascript error is thrown when clicking to open the selectbox
     
 See "margin:auto on body" above. If that is not the problem, please let me know on the
 [Issues Page](https://github.com/revsystems/jQuery-SelectBox/issues).
 
-## Bug Reports
+# Bug Reports
 
   Before you report a bug, I highly suggest making sure you have the most up-to-date version of 
   jQuery-SelectBox. I update the code very frequently and may introduce/squash bugs in rapid succession. This 
