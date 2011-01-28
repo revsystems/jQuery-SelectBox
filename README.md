@@ -228,7 +228,7 @@ unless you're using huge z-index values.
 Across different browsers and jQuery versions, it is very difficult to get a stanard margin value for the 
 body when it is set to "auto".
 
-If you have margin-left set to auto for your body element, jQuery-SelectBox will comlpetely break in IE7. 
+If you have margin-left set to auto for your body element, jQuery-SelectBox will completely break in IE7. 
 In other browsers, it may or may not position incorrectly.
 
 If you need to center your page, I highly recommend not doing it with the `body` tag. The implementation 
@@ -255,6 +255,34 @@ In your HTML:
     </div>
     
 If you use this pattern, you should have no issues with margin:auto on `body`.
+
+**I need to keep margin:auto on my body tag. How do I get jQuery-SelectBox to behave?**
+
+If you're stuck with margin:auto on the `body` element, then I suggest specifying the ddCtx option.
+The ddCtx (dropdown context) option lets you change which element the dropdown is appended to, thereby 
+avoiding dependence on the body tag's margin.
+
+For example, you might have this fragment in your markup:
+
+    <body>
+      <div id="an_arbitrary_container">
+        <select>
+          <option>An Option</option>
+        </select>
+      </div>
+    </body>
+
+In which case, you'd want the following CSS:
+
+    #an_arbitrary_container{position:relative;}
+
+And to specify ddCtx when you initialize jQuery-SelectBox:
+
+    $("select").sb({ ddCtx: "#an_arbitrary_container" });
+    
+The downside to this method is that, if z-index comes into play, the dropdown might appear BEHIND siblings of 
+#an_arbitrary_container--due to the buggy z-index handling in IE7. Consider yourself warned. You can manipulate 
+the z-indexes in CSS so it works, but it's advanced.
   
 **IE7/IE8: Javascript error is thrown when clicking to open the selectbox**
     
