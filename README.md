@@ -109,7 +109,7 @@ Refreshing can be done at any time, even while the SelectBox is open.
 
 You can also change the options for a SelectBox on the fly:
 
-    // this initializes all <select>s
+    // this initializes all s
     $("select").sb()
     
     // and this sets a specific set to use fixedWidth styling:
@@ -211,35 +211,49 @@ In your css, you can add the following to make a selectbox with visual width = 1
       
 ## Troubleshooting
 
-  **jQuery-SelectBox in div with z-index**
+**jQuery-SelectBox in div with z-index**
   
-      If you call $("select").sb() (no special options) on a select in a z-index'ed element, the dropdown 
-      may appear UNDERNEATH the element.
+If you call $("select").sb() (no special options) on a select in a z-index'ed element, the dropdown 
+may appear UNDERNEATH the element.
+
+You have two options in dealing with this scenario. The first is setting ddCtx to the absolutely 
+positioned element. This will make sure that it always appears on top of it. Or you can modify the 
+css for .items to have a z-index greater than the parent div.
+
+For newer versions, I set the default z-index of .items to 99999, so you probably won't see this issue 
+unless you're using huge z-index values.
       
-      You have two options in dealing with this scenario. The first is setting ddCtx to the absolutely 
-      positioned element. This will make sure that it always appears on top of it. Or you can modify the 
-      css for .items to have a z-index greater than the parent div.
+**margin:auto on body**
       
-      For newer versions, I set the default z-index of .items to 99999, so you probably won't see this issue 
-      unless you're using huge z-index values.
+Across different browsers and jQuery versions, it is very difficult to get a stanard margin value for the 
+body when it is set to "auto".
+
+If you have margin-left set to auto for your body element, jQuery-SelectBox will comlpetely break in IE7. 
+In other browsers, it may or may not position incorrectly.
+
+If you need to center your page, I highly recommend not doing it with the `body` tag. The implementation 
+is too finicky. Instead, I often use the following pattern.
+
+In your css file:
+
+    body{margin:0;}
+    .outer_container{text-align:center;} /* text-align centers the child div in old versions of IE */
+    .inner_container{margin:0 auto;text-align:left;width:960px} /* margin:auto centers in newer browsers and text-align:left resets the sub-elements */
+
+In your HTML:
+
+    <div class="outer_container">
+      <div class="inner_container">
+        Everything in here will be centered
+      </div>
+    </div>
+    
+If you use this pattern, you should have no issues with margin:auto on `body`.
   
-  **Dropdown appears relative to display, but it's slightly off**
-  
-      First, if you're using all defaults, check if there is margin on the body element on your page. A margin 
-      there throws off the calculations of jQuery-SelectBox. If this is the case, you may want to change the 
-      ddCtx option to something you know will work.
-      
-      If you've set the ddCtx and it's still not positioning correctly, make sure the ddCtx element has 
-      position:relative assigned to its css.
-  
-  **IE7/IE8: Javascript error is thrown when clicking to open the selectbox**
-      
-      First thing to check is if you are using "auto" or some other non-integer value for the margin on your 
-      "body" element. jquery-sb tries to be compatible with integer margins on body, but may have huge problems 
-      with "auto" in these browsers.
-      
-      If you need to center your page, you can do with without setting a margin on "body". Please check out 
-      the jquery-sb demo page along with my use of outer_container and inner_container classes.
+**IE7/IE8: Javascript error is thrown when clicking to open the selectbox**
+    
+See "margin:auto on body" above. If that is not the problem, please let me know on the
+[Issues Page](https://github.com/revsystems/jQuery-SelectBox/issues).
 
 ## Bug Reports
 
@@ -249,4 +263,4 @@ In your css, you can add the following to make a selectbox with visual width = 1
   development branch will be started.
   
   If you spot a bug that's lingering, please let me know on the
-  [https://github.com/revsystems/jQuery-SelectBox/issues](jQuery-SelectBox Github Issues page).
+  [jQuery-SelectBox Github Issues page](https://github.com/revsystems/jQuery-SelectBox/issues).
