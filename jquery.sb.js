@@ -38,63 +38,6 @@
         $(this).triggerHandler(event, params);
       });
     };
-    
-    $.fn.margin = function( side ) {
-        var $e = $(this).eq(0);
-        
-        // different methods for each browser type
-        function shiftDiff( s ) {
-            var x, 
-                res, 
-                cs = "margin" + s.substring(0,1).toUpperCase() + s.substring(1);
-            if($e[0].currentStyle !== undefined) {
-                // if we get auto back, do the offset diff trick
-                res = $e[0].currentStyle[cs];
-                if(res === "auto") {
-                    x = $e.offset()[s];
-                    $e[0].style[cs] = 0;
-                    res = x - $e.offset()[s];
-                    $e[0].style[cs] = "auto";
-                }
-                return parseFloat(res);
-            } else if($.browser.mozilla) {
-                if(s.match(/left|right/i) && $e.css("margin-" + s) === "0px") {
-                    // 0 could be 0 or auto. to find out, set it to 0 manually then do the offset diff trick
-                    // if it should be auto, make sure you set it back to that
-                    x = $e.offset()[s];
-                    if($().jquery >= "1.4.2") {
-                        var $mark = $("<div></div>");
-                        $e.append($mark);
-                        x = $mark.offset()[s];
-                        $mark.remove();
-                    }
-                    $e.css("margin-" + s, 0);
-                    res = x - $e.offset()[s];
-                    if($e.offset()[s] !== x) { $e.css("margin-" + s, "auto"); }
-                    return res;
-                } else {
-                    return parseFloat($e.css("margin-" + s));
-                }
-            } else if(window.getComputedStyle) {
-                // webkit, just use getComputedStyle, it works
-                return parseFloat(getComputedStyle($e[0], "")["margin-" + side]);
-            } else {
-                // unknown
-                return parseFloat($e.css("margin-" + s));
-            }
-        }
-        
-        // if auto is working (centered), then left/right 
-        // and top/bottom should return the same value
-        if(side === "left" || side === "right") { return shiftDiff("left"); }
-        if(side === "top" || side === "bottom") { return shiftDiff("top"); }
-        
-        // there are other tricks, but this takes auto into account
-        if(side === "width") { return $e.margin("left") + $e.margin("right"); }
-        if(side === "height") { return $e.margin("top") + $e.margin("bottom"); }
-        return undefined;
-    };
-    
     var aps = Array.prototype.slice,
         randInt = function() {
             return Math.floor(Math.random() * 999999999);
@@ -106,11 +49,14 @@
             clazz = arguments[1],   // A reference to the class that you are associating
             klazz = clazz,          // A version of clazz with a delayed constructor
             extOpt = {},            // used to extend clazz with a variable name for the init function
-            opts = $.extend({
-                elem: "elem",
-                access: "access",
-                init: "init"
-            }, arguments[2]);
+            undefined;              // safety net
+        
+        opts = $.extend({
+            elem: "elem",           // the property name on the object that will be set to the current jQuery context
+            access: "access",       // the name of the access function to be set on the object
+            init: "init",           // the name of the init function to be set on the object
+            instantAccess: false    // when true, treat all args as access args (ignore constructor args) and allow construct/function call at the same time
+        }, arguments[2]);
         
         if(clazz._super) {
             extOpt[opts.init] = function(){};
@@ -118,16 +64,15 @@
         }
         
         $.fn[name] = function() {
-            
             var result, args = arguments;
                 
             $(this).each(function() {
-                var res,
-                    $e = $(this),
-                    obj = $e.data(name);
+                var $e = $(this),
+                    obj = $e.data(name),
+                    isNew = !obj;
                 
-                // if the object is not defined for this element
-                if(!obj) {
+                // if the object is not defined for this element, then construct
+                if(isNew) {
                     
                     // create the new object and restore init if necessary
                     obj = new klazz();
@@ -138,13 +83,16 @@
                     // set the elem property and initialize the object
                     obj[opts.elem] = $e[0];
                     if(obj[opts.init]) {
-                        obj[opts.init].apply(obj, aps.call(args, 0));
+                        obj[opts.init].apply(obj, opts.instantAccess ? [] : aps.call(args, 0));
                     }
                     
                     // associate it with the element
                     $e.data(name, obj);
                     
-                } else {
+                }
+                
+                // if it is defined or we allow instance access, then access
+                if(!isNew || opts.instantAccess) {
                   
                     // call the access function if it exists (allows lazy loading)
                     if(obj[opts.access]) {
@@ -157,8 +105,7 @@
                         if($.isFunction(obj[args[0]])) {
                         
                             // use the method access interface
-                            res = obj[args[0]].apply(obj, aps.call(args, 1));
-                            result = res;
+                            result = obj[args[0]].apply(obj, aps.call(args, 1));
                             
                         } else if(args.length === 1) {
                           
@@ -190,11 +137,11 @@
             });
             
             // chain if no results were returned from the clazz's method (it's a setter)
-            if(result !== undefined) {
+            if(result === undefined) {
               return $(this);
             }
             
-            // return the first result
+            // return the first result if not chaining
             return result;
         };
     };
@@ -364,7 +311,7 @@
         // create new markup from an <option>
         createOption = function( $option, index ) {
             if(!$option) { 
-                $option = $("<option value='' selected='selected'>&nbsp;</option>");
+                $option = $("<option value=''>&nbsp;</option>");
                 index = 0;
             }
             var $li = $("<li id='sbo" + randInt() + "'></li>")
@@ -529,8 +476,7 @@
                 ddY = 0,
                 dir = "",
                 bottomSpace, topSpace,
-                bottomOffset, spaceDiff,
-                bodyX, bodyY;
+                bottomOffset, spaceDiff;
             
             // modify dropdown css for getting values
             $dd.removeClass("above");
@@ -570,21 +516,12 @@
                 dir = "down";
             }
             
-            bodyX = $().jquery >= "1.4.2" && $.browser.msie
-                ? $("body").margin("left")
-                : -$("body").offset().left;
-            bodyY = $().jquery >= "1.4.2" && $.browser.msie
-                ? $("body").margin("top")
-                : -$("body").offset().top;
-            if($.browser.msie && $.browser.version < 8 && $().jquery >= "1.4.2") {
-                bodyX *= -1;
-                bodyY *= -1;
-            }
+            // modify dropdown css for display
             $dd.hide().css({
-                left: ddX - ($ddCtx.is("body") ? bodyX : 0),
+                left: ddX,
                 maxHeight: ddMaxHeight,
                 position: "absolute",
-                top: ddY - ($ddCtx.is("body") ? bodyY : 0),
+                top: ddY,
                 visibility: "visible"
             });
             if(dir === "up") {
