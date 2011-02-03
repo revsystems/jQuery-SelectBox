@@ -12,7 +12,7 @@
     Please see the accompanying LICENSE.txt for licensing information.
 */
 
-(function( $ ) {
+(function( $, window, undefined ) {
     // utility functions
     $.fn.borderWidth = function() { return $(this).outerWidth() - $(this).innerWidth(); };
     $.fn.paddingWidth = function() { return $(this).innerWidth() - $(this).width(); };
@@ -162,6 +162,7 @@
             searchTerm = "",
             cstTimeout = null,
             delayReloadTimeout = null,
+            resizeTimeout = null,
             
             // functions
             loadSB,
@@ -175,6 +176,8 @@
             centerOnSelected,
             closeSB,
             positionSB,
+            positionSBIfOpen,
+            delayPositionSB,
             clickSB,
             clickSBItem,
             keyupSB,
@@ -294,19 +297,31 @@
                     .click(falseFunc);
                 $items.filter(".disabled")
                     .click(falseFunc);
+                $(window).resize($.throttle ? $.throttle(100, positionSBIfOpen) : delayPositionSB);
             } else {
                 $sb.addClass("disabled").attr("aria-disabled");
                 $display.click(function( e ) { e.preventDefault(); });
             }
             
             // bind custom events
-            $sb.bind("close.sb", closeSB)
-                .bind("destroy.sb", destroySB);
+            $sb.bind("close.sb", closeSB).bind("destroy.sb", destroySB);
             $orig.bind("reload.sb", reloadSB);
             if($.fn.tie && o.useTie) {
                 $orig.bind("domupdate.sb", delayReloadSB);
             }
         };
+        
+        delayPositionSB = function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(positionSBIfOpen, 50);
+        };
+        
+        positionSBIfOpen = function() {
+            if($sb.is(".open")) {
+                positionSB();
+                openSB(true);
+            }
+        }
         
         // create new markup from an <option>
         createOption = function( $option, index ) {
@@ -344,6 +359,7 @@
             $orig
                 .unbind(".sb")
                 .removeClass("has_sb");
+            $(window).unbind("resize", delayPositionSB);
             if(!internal) {
                 $orig.removeData("sb");
             }
@@ -477,6 +493,7 @@
                 ddX = $display.offsetFrom($ddCtx).left,
                 ddY = 0,
                 dir = "",
+                ml, mt,
                 bottomSpace, topSpace,
                 bottomOffset, spaceDiff,
                 bodyX, bodyY;
@@ -519,11 +536,13 @@
                 dir = "down";
             }
             
+            ml = ("" + $("body").css("margin-left")).match(/^\d+/) ? $("body").css("margin-left") : 0;
+            mt = ("" + $("body").css("margin-top")).match(/^\d+/) ? $("body").css("margin-top") : 0;
             bodyX = $().jquery >= "1.4.2"
-                ? parseInt($("body").css("margin-left"))
+                ? parseInt(ml)
                 : $("body").offset().left;
             bodyY = $().jquery >= "1.4.2"
-                ? parseInt(parseInt($("body").css("margin-left")))
+                ? parseInt(mt)
                 : $("body").offset().top;
             
             
@@ -844,4 +863,4 @@
 
     $.proto("sb", SelectBox);
 
-}(jQuery));
+}(jQuery, window));
