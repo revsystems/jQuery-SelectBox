@@ -339,12 +339,14 @@
         };
         
         // unbind and remove
-        destroySB = function() {
+        destroySB = function( internal ) {
             $sb.remove();
             $orig
                 .unbind(".sb")
-                .removeClass("has_sb")
-                .removeData(self.id);
+                .removeClass("has_sb");
+            if(!internal) {
+                $orig.removeData("sb");
+            }
         };
         
         // destroy then load, maintaining open/focused state if applicable
@@ -352,7 +354,7 @@
             var isOpen = $sb.is(".open"),
                 isFocused = $display.is(".focused");
             closeSB(true);
-            destroySB();
+            destroySB(true);
             self.init(o);
             if(isOpen) {
                 $orig.focus();
@@ -766,7 +768,7 @@
         
         // constructor
         this.init = function( opts ) {
-
+            
             // this plugin is not compatible with IE6 and below;
             // a normal <select> will be displayed for old browsers
             if($.browser.msie && $.browser.version < 7) {
