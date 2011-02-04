@@ -297,7 +297,9 @@
                     .click(falseFunc);
                 $items.filter(".disabled")
                     .click(falseFunc);
-                $(window).resize($.throttle ? $.throttle(100, positionSBIfOpen) : delayPositionSB);
+                if(!$.browser.msie || $.browser.version >= 9) {
+                    $(window).resize($.throttle ? $.throttle(100, positionSBIfOpen) : delayPositionSB);
+                }
             } else {
                 $sb.addClass("disabled").attr("aria-disabled");
                 $display.click(function( e ) { e.preventDefault(); });
