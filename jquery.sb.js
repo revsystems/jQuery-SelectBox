@@ -767,6 +767,7 @@
             $(document)
                 .unbind("keyup", keyupSB)
                 .unbind("keydown", stopPageHotkeys)
+                .unbind("keypress", stopPageHotkeys)
                 .unbind("keydown", keydownSB);
         };
         
