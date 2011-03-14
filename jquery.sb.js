@@ -412,7 +412,7 @@
         // hide and reset dropdown markup
         closeSB = function( instantClose ) {
             if($sb.is(".open")) {
-                //$display.blur();
+                $display.blur();
                 $items.removeClass("hover");
                 $(document)
                     .unbind("keyup", keyupSB)
@@ -763,6 +763,7 @@
         
         // when the sb is blurred (by tab or click), disable hotkey selection
         blurSB = function() {
+	console.info('bluring SB: ', $sb);
             $sb.removeClass("focused");
             $(document)
                 .unbind("keyup", keyupSB)
