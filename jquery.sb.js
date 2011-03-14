@@ -763,7 +763,6 @@
         
         // when the sb is blurred (by tab or click), disable hotkey selection
         blurSB = function() {
-	console.info('bluring SB: ', $sb);
             $sb.removeClass("focused");
             $(document)
                 .unbind("keyup", keyupSB)
