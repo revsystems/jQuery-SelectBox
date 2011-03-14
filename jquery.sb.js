@@ -283,8 +283,8 @@
                     .bind("blur.sb", blurOrig)
                     .bind("focus.sb", focusOrig);
                 $display
-                    .mousedown(addActiveState)
-                    .mousedown(clickSB)
+                    .mouseup(addActiveState)
+                    .mouseup(clickSB)
                     .click(falseFunc)
                     .focus(focusSB)
                     .blur(blurSB)
@@ -412,7 +412,7 @@
         // hide and reset dropdown markup
         closeSB = function( instantClose ) {
             if($sb.is(".open")) {
-                $display.blur();
+                //$display.blur();
                 $items.removeClass("hover");
                 $(document)
                     .unbind("keyup", keyupSB)
