@@ -201,7 +201,8 @@
             closeAndUnbind,
             blurAllButMe,
             stopPageHotkeys,
-            flickerDisplay;
+            flickerDisplay,
+						unbind;
         
         loadSB = function() {
             
@@ -390,9 +391,19 @@
         
         // when the user clicks outside the sb
         closeAndUnbind = function() {
+						$sb.removeClass("focused");
             closeSB();
-            $(document).unbind("click", closeAndUnbind);
+						unbind();
         };
+				
+				unbind = function() {
+					$(document)
+							.unbind("click", closeAndUnbind)
+							.unbind("keyup", keyupSB)
+							.unbind("keypress", stopPageHotkeys)
+							.unbind("keydown", stopPageHotkeys)
+							.unbind("keydown", keydownSB);
+				};
         
         // trigger all sbs to close
         closeAll = function() {
@@ -414,11 +425,7 @@
             if($sb.is(".open")) {
                 $display.blur();
                 $items.removeClass("hover");
-                $(document)
-                    .unbind("keyup", keyupSB)
-                    .unbind("keydown", stopPageHotkeys)
-                    .unbind("keypress", stopPageHotkeys)
-                    .unbind("keydown", keydownSB);
+								unbind();
                 $dd.attr("aria-hidden", "true");
                 if(instantClose === true) {
                   $dd.hide();
@@ -484,7 +491,6 @@
             } else {
                 $dd.fadeIn(o.animDuration, centerOnSelected);
             }
-            $(document).click(closeAndUnbind);
             $orig.focus();
         };
         
@@ -750,14 +756,11 @@
             closeAllButMe();
             $sb.addClass("focused");
             $(document)
-                .unbind("keyup", keyupSB)
+								.click(closeAndUnbind)
                 .keyup(keyupSB)
-                .unbind("keypress", stopPageHotkeys)
                 .keypress(stopPageHotkeys)
-                .unbind("keydown", stopPageHotkeys)
                 .keydown(stopPageHotkeys)
                 .keydown(keydownSB)
-                .unbind("keydown", keydownSB)
                 .keydown(keydownSB);
         };
         
