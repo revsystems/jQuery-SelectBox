@@ -7,34 +7,33 @@
   
   Please feel free to rate this plugin on [plugins.jquery.com](http://plugins.jquery.com/project/jquery-sb).
 
-## Demo
+# Demo
 
   You can view the selectboxes in action [here](http://dl.dropbox.com/u/124192/websites/selectbox/index.html).
   
-## TODO
+# TODO
 
-  * Refactor codebase
-    * e.g. $("select").sb("refresh") instead of $("select").triggerHandler("reload")
-    * integrate with [jQuery-inPixels](http://plugins.jquery.com/project/jquery-inpixels)
-    * Allow option changes after creation
-  * Apply ARIA markup
+  * Test ARIA markup
   * Create optional skins
 
-## Features
+# Features
 
+  * Recreates and extends all functionality of the browser's built-in `<select>` element
   * Fully stylable and flexible with standard, valid markup
+  * Compliant with ARIA guidelines and best practices
   * Original select is updated behind-the-scenes
-  * Change event handlers on original select still work
-  * Allows up/down hotkeys on focus
-  * Allows automatic matching of typed strings on focus
+  * Change event handlers on original `<select>` still work
+  * Keyboard Accessible: Manages tab focus, supports up/down/home/end hotkeys and automatic matching of typed strings
   * Javascript animations on close/open
   * Intelligent collision avoidance (the selectbox tries to fit on the screen)
   * Deals effectively with cross-browser z-index issues
   * Handles optgroups
   * Handles disabled selects
+  * Handles disabled optgroups
   * Handles disabled options
-  * Can be reloaded arbitrarily, i.e. when you dynamically add/remove options from the original select
-  * Can be set to reload automatically, using [jquery.tie](https://github.com/revsystems/jQuery-Tie), when the underlying select changes
+  * Can be refreshed arbitrarily, i.e. when you dynamically add/remove options from the original select
+  * Options for a specific `<select>` can be changed on the fly
+  * Can be set to refresh automatically, using [jquery.tie](https://github.com/revsystems/jQuery-Tie), when the underlying `<select>` changes
   * Allows custom markup formatting for visible elements
 
   The css in this plugin also includes an example custom style called "round_sb".
@@ -42,19 +41,22 @@
   and (b) to give you a familiar but slightly more modern version of the selectbox 
   that you can integrate with minimal or no css modification.
 
-## Compatibility
+# Compatibility
 
-  jQuery-SelectBox has been tested in the following browsers:
+  jQuery-SelectBox has been tested and confirmed working in the following browsers:
   
   * Firefox 3.6.12
   * Google Chrome 7.0.517.44
-  * IE7 (via IE9 beta)
-  * IE8 (via IE9 beta)
+  * Opera 11.00 build 1156
   * IE9 beta
+  * IE8 (via IE9 beta)
+  * IE7 (via IE9 beta)
   
   It requires [jQuery version 1.3.x](http://jquery.com) and up.
+  
+  IE6 and below are ignored by jQuery-SelectBox.
 
-## Usage
+# Usage
 
 Requires [jQuery](http://jquery.com) and this plugin.
 
@@ -82,18 +84,17 @@ To apply with options set:
     $(document).ready(function() {
       $("select").sb({
         animDuration: 1000,
-        ddCtx: function() { return $(this).closest("form"); },
-        fixedWidth: false,
+        fixedWidth: true,
         etc...
       });
     });
 
-If you've used javascript to modify the contents of the original select, and you want the changes to appear in the replacement, triggering "reload" should match them:
+If you've used javascript to modify the contents of the original select, and you want the changes to appear in the replacement, calling "refresh" should match them:
 
     $(document).ready(function() {
       $("select").sb();
       $("select").append("<option>Hey! I'm new!</option>");
-      $("select").triggerHandler("reload");
+      $("select").sb("refresh");
     });
     
 Alternatively, if you don't have control over the function that triggers the reload--for example, if you're using an AJAX framework--you can use 
@@ -103,10 +104,20 @@ Alternatively, if you don't have control over the function that triggers the rel
       $("select").sb({ useTie: true });
       $("select").append("<option>Hey! I'm new!</option>");
     });
+    
+Refreshing can be done at any time, even while the SelectBox is open.
 
-## Custom Styling
+You can also change the options for a SelectBox on the fly:
 
-### Making a fixed width selectbox
+    // this initializes all s
+    $("select").sb()
+    
+    // and this sets a specific set to use fixedWidth styling:
+    $("select.fixed_width").sb("options", { fixedWidth: true });
+
+# Custom Styling
+
+## Making a fixed width selectbox
 
 Say you want to make your selectboxes a fixed width so they line up with the rest of your inputs. Try something like this.
 
@@ -123,10 +134,10 @@ In your css, you can add the following to make a selectbox with visual width = 1
       padding:0 24px 0 3px; /* remember padding contributes to the overall width. padding-right is large enough here for the arrow graphic. */
     }
     .selectbox.fixed_width.items{
-      width:100px; /* width of display text plus the padding (60 + 27) = 87, so they line up */
+      width:100px; /* width of display text plus the padding (73 + 27) = 100, so they line up */
     }
 
-## Options
+# Options
   
   View defaults and short descriptions for options in jquery.sb.js. This list is meant to be more 
   informative than the js comments.
@@ -197,35 +208,98 @@ In your css, you can add the following to make a selectbox with visual width = 1
       Default is false. When set to true and jquery.tie is 
       included on the page, this will automatically monitor changes in the underlying select and update 
       jquery-sb accordingly.
-      
-## Troubleshooting
 
-  **jQuery-SelectBox in div with z-index**
+      
+# Troubleshooting
+
+## jQuery-SelectBox in div with z-index
   
-      If you call $("select").sb() (no special options) on a select in a z-index'ed element, the dropdown 
-      may appear UNDERNEATH the element.
-      
-      You have two options in dealing with this scenario. The first is setting ddCtx to the absolutely 
-      positioned element. This will make sure that it always appears on top of it. Or you can modify the 
-      css for .items to have a z-index greater than the parent div.
-      
-      For newer versions, I set the default z-index of .items to 99999, so you probably won't see this issue 
-      unless you're using huge z-index values.
+If you call $("select").sb() (no special options) on a select in a z-index'ed element, the dropdown 
+may appear UNDERNEATH the element.
+
+You have two options in dealing with this scenario. The first is setting ddCtx to the absolutely 
+positioned element. This will make sure that it always appears on top of it. Or you can modify the 
+css for .items to have a z-index greater than the parent div.
+
+For newer versions, I set the default z-index of .items to 99999, so you probably won't see this issue 
+unless you're using huge z-index values.
+
+
+## margin:auto on body
+
+Across different browsers and jQuery versions, it is very difficult to get a stanard margin value for the 
+body when it is set to "auto".
+
+If you have margin-left set to auto for your body element, jQuery-SelectBox will completely break in IE7. 
+In other browsers, it may or may not position incorrectly.
+
+If you need to center your page, I highly recommend not doing it with the `body` tag. The implementation 
+is too finicky. Instead, I often use the following pattern.
+
+In your css file:
+
+    body{margin:0;}
+    .outer_container{
+      text-align:center; /* text-align centers the child div in old versions of IE */
+    } 
+    .inner_container{
+      margin:0 auto; /* margin:auto centers in newer browsers */
+      text-align:left; /* text-align:left resets the sub-elements */
+      width:960px; /* the width of your page */
+    } 
+
+In your HTML:
+
+    <div class="outer_container">
+      <div class="inner_container">
+        Everything in here will be centered
+      </div>
+    </div>
+    
+If you use this pattern, you should have no issues with margin:auto on `body`.
+
+
+## I need to keep margin:auto on my body tag. How do I get jQuery-SelectBox to behave?
+
+If you're stuck with margin:auto on the `body` element, then I suggest specifying the ddCtx option.
+The ddCtx (dropdown context) option lets you change which element the dropdown is appended to, thereby 
+avoiding dependence on the body tag's margin.
+
+For example, you might have this fragment in your markup:
+
+    <body>
+      <div id="an_arbitrary_container">
+        <select>
+          <option>An Option</option>
+        </select>
+      </div>
+    </body>
+
+In which case, you'd want the following CSS:
+
+    #an_arbitrary_container{position:relative;}
+
+And to specify ddCtx when you initialize jQuery-SelectBox:
+
+    $("select").sb({ ddCtx: "#an_arbitrary_container" });
+    
+The downside to this method is that, if z-index comes into play, the dropdown might appear BEHIND siblings of 
+`#an_arbitrary_container`--due to the buggy z-index handling in IE7. Consider yourself warned. You can manipulate 
+the z-indexes in CSS so it works, but it's advanced.
   
-  **Dropdown appears relative to display, but it's slightly off**
+
+## IE7/IE8: Javascript error is thrown when clicking to open the selectbox
+    
+See "margin:auto on body" above. If that is not the problem, please let me know on the
+[Issues Page](https://github.com/revsystems/jQuery-SelectBox/issues).
+
+
+# Bug Reports
+
+  Before you report a bug, I highly suggest making sure you have the most up-to-date version of 
+  jQuery-SelectBox. I update the code very frequently and may introduce/squash bugs in rapid succession. This 
+  will continue until an official release is announced, at which point a stable download will be created and a new 
+  development branch will be started.
   
-      First, if you're using all defaults, check if there is margin on the body element on your page. A margin 
-      there throws off the calculations of jQuery-SelectBox. If this is the case, you may want to change the 
-      ddCtx option to something you know will work.
-      
-      If you've set the ddCtx and it's still not positioning correctly, make sure the ddCtx element has 
-      position:relative assigned to its css.
-  
-  **IE7/IE8: Javascript error is thrown when clicking to open the selectbox**
-      
-      First thing to check is if you are using "auto" or some other non-integer value for the margin on your 
-      "body" element. jquery-sb tries to be compatible with integer margins on body, but may have huge problems 
-      with "auto" in these browsers.
-      
-      If you need to center your page, you can do with without setting a margin on "body". Please check out 
-      the jquery-sb demo page along with my use of outer_container and inner_container classes.
+  If you spot a bug that's lingering, please let me know on the
+  [jQuery-SelectBox Github Issues page](https://github.com/revsystems/jQuery-SelectBox/issues).
