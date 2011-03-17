@@ -202,7 +202,7 @@
             blurAllButMe,
             stopPageHotkeys,
             flickerDisplay,
-						unbind;
+            unbind;
         
         loadSB = function() {
             
@@ -391,19 +391,19 @@
         
         // when the user clicks outside the sb
         closeAndUnbind = function() {
-						$sb.removeClass("focused");
+            $sb.removeClass("focused");
             closeSB();
-						unbind();
+            unbind();
         };
-				
-				unbind = function() {
-					$(document)
-							.unbind("click", closeAndUnbind)
-							.unbind("keyup", keyupSB)
-							.unbind("keypress", stopPageHotkeys)
-							.unbind("keydown", stopPageHotkeys)
-							.unbind("keydown", keydownSB);
-				};
+        
+        unbind = function() {
+          $(document)
+              .unbind("click", closeAndUnbind)
+              .unbind("keyup", keyupSB)
+              .unbind("keypress", stopPageHotkeys)
+              .unbind("keydown", stopPageHotkeys)
+              .unbind("keydown", keydownSB);
+        };
         
         // trigger all sbs to close
         closeAll = function() {
@@ -425,7 +425,7 @@
             if($sb.is(".open")) {
                 $display.blur();
                 $items.removeClass("hover");
-								unbind();
+                unbind();
                 $dd.attr("aria-hidden", "true");
                 if(instantClose === true) {
                   $dd.hide();
@@ -756,7 +756,7 @@
             closeAllButMe();
             $sb.addClass("focused");
             $(document)
-								.click(closeAndUnbind)
+                .click(closeAndUnbind)
                 .keyup(keyupSB)
                 .keypress(stopPageHotkeys)
                 .keydown(stopPageHotkeys)
