@@ -604,9 +604,9 @@
         
         // when the user explicitly clicks an item
         clickSBItem = function( e ) {
+            selectItem.call(this);
             closeAndUnbind();
             $orig.focus();
-            selectItem.call(this);
             return false;
         };
         
