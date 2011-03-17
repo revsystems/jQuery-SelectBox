@@ -17,6 +17,7 @@
   padding:0 24px 0 3px;
   position:relative;
   text-decoration:none;
+  overflow:hidden;
 }
 .selectbox.disabled .display{color:#999;}
 .selectbox.focused .display .text{background-color:#3399ff;color:#fcfcfc;display:inline-block;*display:inline;zoom:1;}
