@@ -353,7 +353,9 @@
         
         // loses focus if original is blurred
         blurOrig = function() {
-            $display.triggerHandler("blur");
+            if(!$sb.is(".open")) {
+                $display.triggerHandler("blur");
+            }
         };
         
         // unbind and remove
@@ -678,6 +680,10 @@
             var $selected = getSelected(),
                 $enabled = getEnabled();
             switch(e.which) {
+            case 9: // tab
+                closeSB();
+                blurSB();
+                break;
             case 35: // end
                 if($selected.size() > 0) {
                     e.preventDefault();
@@ -760,13 +766,13 @@
                 .keyup(keyupSB)
                 .keypress(stopPageHotkeys)
                 .keydown(stopPageHotkeys)
-                .keydown(keydownSB)
                 .keydown(keydownSB);
         };
         
         // when the sb is blurred (by tab or click), disable hotkey selection
         blurSB = function() {
             $sb.removeClass("focused");
+            $display.removeClass("active");
             $(document)
                 .unbind("keyup", keyupSB)
                 .unbind("keydown", stopPageHotkeys)
