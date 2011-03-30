@@ -39,7 +39,9 @@
     background:transparent url(images/select_arrow.gif) no-repeat center center;
     display:inline-block;*display:inline;
     height:4px;
-    vertical-align:middle;
+    left:.33em;
+    position:absolute;
+    top:.5em;
     width:7px;
     zoom:1;
 }
