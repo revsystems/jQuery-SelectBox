@@ -596,7 +596,7 @@
             }
             
             // change the selection to this item
-            getEnabled().removeClass("selected");
+            $items.removeClass("selected");
             $item.addClass("selected");
             $sb.attr("aria-active-descendant", $item.attr("id"));
             
