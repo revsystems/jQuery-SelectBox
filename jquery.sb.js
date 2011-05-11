@@ -218,7 +218,7 @@
                 ? o.displayFormat.call($orig.find("option:selected")[0], 0, 0)
                 : "&nbsp;";
             $display = $("<div class='display " + $orig.attr("class") + "' id='sbd" + randInt() + "'></div>")
-                .append("<div class='text'>" + displayMarkup + "</div>")
+                .append($("<div class='text'></div>").append(displayMarkup))
                 .append(o.arrowMarkup);
             $sb.append($display);
             
