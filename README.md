@@ -159,8 +159,14 @@ In your css, you can add the following to make a selectbox with visual width = 1
       
   **optionFormat** (function)
       
-      Given an option as the context, returns a string that will be displayed in the dropdown. The default
-      is simply to use the option's text.
+      Given an option as the context, returns a string or DOM/jQuery object that will be displayed in the dropdown.
+      The default is simply to use the option's text.
+      
+  **displayFormat** (function)
+      
+      Given an option as the context, returns a string or DOM/jQuery object that will be displayed in 
+      the "display"--the portion of the selectbox that is always visible. If not specified, it will default to 
+      the value of optionFormat.
       
   **optgroupFormat** (function)
       
