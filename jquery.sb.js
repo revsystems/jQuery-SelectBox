@@ -228,7 +228,7 @@
             $sb.append($dd)
                 .attr("aria-owns", $dd.attr("id"));
             if($orig.children().size() === 0) {
-                $dd.append(createOption());
+                $dd.append(createOption().addClass("selected"));
             } else {
                 $orig.children().each(function( i ) {
                     var $opt, $og, $ogItem, $ogList;
