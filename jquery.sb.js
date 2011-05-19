@@ -587,13 +587,8 @@
                 newVal = $item.data("value");
             
             // update the original <select>
-            if(o.useTie && $.fn.tie) {
-                $orig.find("option").old_removeAttr("selected");
-                $($item.data("orig")).old_attr("selected", "selected");
-            } else {
-                $orig.find("option").removeAttr("selected");
-                $($item.data("orig")).attr("selected", "selected");
-            }
+            $orig.find("option").each(function() { this.selected = false; });
+            $($item.data("orig")).each(function() { this.selected = true; });
             
             // change the selection to this item
             $items.removeClass("selected");
