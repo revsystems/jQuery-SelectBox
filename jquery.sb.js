@@ -206,8 +206,12 @@
         
         loadSB = function() {
             
+            // generate new sb ID and assign it to the original select
+            var id = 'sb' + randInt();
+            $orig.attr( 'sbid', id );
+        	
             // create the new sb
-            $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "' id='sb" + randInt() + "'></div>")
+            $sb = $("<div class='sb " + o.selectboxClass + " " + $orig.attr("class") + "' id='" + id + "'></div>")
                 .attr("role", "listbox")
                 .attr("aria-has-popup", "true")
                 .attr("aria-labelledby", $label.attr("id") ? $label.attr("id") : "");
