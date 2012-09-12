@@ -338,6 +338,7 @@
                     .data("value", $option ? $option.attr("value") : "")
                     .addClass($option.is(":selected") ? "selected" : "")
                     .addClass($option.is(":disabled") ? "disabled" : "")
+					.addClass($option.attr("class"))
                     .attr("aria-disabled", $option.is(":disabled") ? "true" : ""),
                 $inner = $("<div class='item'></div>"),
                 $text = $("<div class='text'></div>")
