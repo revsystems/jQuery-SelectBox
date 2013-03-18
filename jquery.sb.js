@@ -277,12 +277,17 @@
             
             // hide the dropdown now that it's initialized
             $dd.hide();
-            
+            var that = this;
             // bind events
             if(!$orig.is(":disabled")) {
                 $orig
                     .bind("blur.sb", blurOrig)
-                    .bind("focus.sb", focusOrig);
+                    .bind("focus.sb", focusOrig)
+                    .bind('change', function (e, noUpdate) {
+                        if (!noUpdate) {
+                            selectItem(this.options[this.selectedIndex].innerHTML);
+                        }
+                    });
                 $display
                     .mouseup(addActiveState)
                     .mouseup(clickSB)
@@ -349,7 +354,9 @@
         // causes focus if original is focused
         focusOrig = function() {
             blurAllButMe();
-            $display.triggerHandler("focus");
+            if (o.clickOrTouch === 'click') {
+                $display.triggerHandler("focus");
+            }
         };
         
         // loses focus if original is blurred
@@ -481,18 +488,21 @@
         openSB = function( instantOpen ) {
             var dir,
                 $ddCtx = getDDCtx();
-            blurAllButMe();
-            $sb.addClass("open");
-            $ddCtx.append($dd);
-            dir = positionSB();
-            $dd.attr("aria-hidden", "false");
-            if(instantOpen === true) {
-                $dd.show();
-                centerOnSelected();
-            } else if(dir === "down") {
-                $dd.slideDown(o.animDuration, centerOnSelected);
-            } else {
-                $dd.fadeIn(o.animDuration, centerOnSelected);
+            // only show the options if we are not on a mobile device
+            if (o.clickOrTouch === 'click') {
+                blurAllButMe();
+                $sb.addClass("open");
+                $ddCtx.append($dd);
+                dir = positionSB();
+                $dd.attr("aria-hidden", "false");
+                if(instantOpen === true) {
+                    $dd.show();
+                    centerOnSelected();
+                } else if(dir === "down") {
+                    $dd.slideDown(o.animDuration, centerOnSelected);
+                } else {
+                    $dd.fadeIn(o.animDuration, centerOnSelected);
+                }
             }
             $orig.focus();
         };
@@ -582,27 +592,32 @@
         };
         
         // when the user selects an item in any manner
-        selectItem = function() {
-            var $item = $(this),
+        selectItem = function(value) {
+            var $item = (o.clickOrTouch === 'click') ? $(this) : false,
                 oldVal = $orig.val(),
-                newVal = $item.data("value");
+                newVal = (typeof value !== 'undefined') ? value : $item.data("value");
             
-            // update the original <select>
-            $orig.find("option").each(function() { this.selected = false; });
-            $($item.data("orig")).each(function() { this.selected = true; });
-            
-            // change the selection to this item
-            $items.removeClass("selected");
-            $item.addClass("selected");
-            $sb.attr("aria-active-descendant", $item.attr("id"));
-            
-            // update the title attr and the display markup
-            $display.find(".text").attr("title", $item.find(".text").html());
-            $display.find(".text").html(o.displayFormat.call($item.data("orig")));
+            if ($item) {
+                // update the original <select>
+                $orig.find("option").each(function() { this.selected = false; });
+                $($item.data("orig")).each(function() { this.selected = true; });
+                
+                // change the selection to this item
+                $items.removeClass("selected");
+                $item.addClass("selected");
+                $sb.attr("aria-active-descendant", $item.attr("id"));
+
+                // update the title attr and the display markup
+                $display.find(".text").attr("title", $item.find(".text").html());
+                $display.find(".text").html(o.displayFormat.call($item.data("orig")));
+            } else {
+                $display.find('.text').attr('title', newVal);
+                $display.find('.text').html(newVal);
+            }
             
             // trigger change on the old <select> if necessary
-            if(oldVal !== newVal) {
-                $orig.change();
+            if(oldVal !== newVal && o.clickOrTouch === 'click') {
+                $orig.change(true);
             }
         };
         
@@ -806,7 +821,7 @@
             if($.browser.msie && $.browser.version < 7) {
               return;
             }
-        
+            
             // get the original <select> and <label>
             $orig = $(this.elem);
             if($orig.attr("id")) {
@@ -832,6 +847,7 @@
                 maxWidth: false,              // if an integer, prevent the display/dropdown from growing past this width; longer items will be clipped
                 selectboxClass: 'selectbox',  // class to apply our markup
                 useTie: false,                // if jquery.tie is included and this is true, the selectbox will update dynamically
+                clickOrTouch: (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) ? 'touchend' : 'click',
                 
                 // markup appended to the display, typically for styling an arrow
                 arrowMarkup: "<div class='arrow_btn'><span class='arrow'></span></div>",
@@ -857,6 +873,7 @@
                     return "<span class='label'>" + $(this).attr("label") + "</span>";
                 }
             }, opts);
+            
             o.displayFormat = o.displayFormat || o.optionFormat;
             
             // generate the new sb
